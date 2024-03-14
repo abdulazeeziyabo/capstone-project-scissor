@@ -113,7 +113,7 @@
             await set(linkRef, newLink); // Set the data at the new child node
     
             // Update UI with shortened link
-            this.shortenedLink = `https://scissors-project-iyabo.netlify.app/#${shortUrlKey}`;
+            this.shortenedLink = `https://${shortUrlKey}/#${domain.value}/${customAlias.value}`;
             toast.success('Success.');
           } catch (error) {
             console.error('Error storing link:', error);

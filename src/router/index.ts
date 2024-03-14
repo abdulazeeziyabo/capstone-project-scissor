@@ -71,6 +71,12 @@ const router = createRouter({
           component: () => import('@/views/custom-url.vue'),
          
         },
+        {
+          path: '/analytics-page',
+          name: 'analytics-page',
+          component: () => import('@/views/analytics-page.vue'),
+         
+        },
 
         
       ]

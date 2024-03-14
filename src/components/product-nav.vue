@@ -7,6 +7,8 @@
      <div class="flex  gap-[80px] middle-nav justify-between items-center h-full " :class="{active: isMenuActive}">
     <routerLink to="/my-urls" class="flex items-center h-full border-b-[3px] border-[#f2f3f4] py-9 cursor-pointer">Shorten your URLs</routerLink>
     <routerLink to="/custom-url" class="flex items-center h-full border-b-[3px] border-[#f2f3f4] py-9 cursor-pointer">Customize your URLs </routerLink>
+     <routerLink to="/analytics-page" class="flex items-center h-full border-b-[3px] border-[#f2f3f4] py-9 cursor-pointer">Analytics</routerLink>
+
     </div>
     <div class="flex gap-8 items-center">
      <button 
@@ -93,6 +95,7 @@ const toggleMenu= ()=>{
        width: 100%;
        text-align: center;
        transition: 0.3s;
+       z-index: 100;
    
      }
      .middle-nav.active{

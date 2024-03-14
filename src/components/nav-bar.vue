@@ -7,7 +7,6 @@
      <div class="flex  gap-[60px] middle-nav justify-between items-center h-full " :class="{active: isMenuActive}">
         <routerLink to="/my-urls" class="flex items-center h-full border-b-[3px] border-[#f2f3f4] py-9">My URLs</routerLink>
     <routerLink to="/price-page" class="flex items-center h-full border-b-[3px] border-[#f2f3f4] py-9">Pricing</routerLink>
-    <routerLink to="/analytics-page" class="flex items-center h-full border-b-[3px] border-[#f2f3f4] py-9">Analytics</routerLink>
     <routerLink to="/faqs-page"  class="flex items-center h-full border-b-[3px] border-[#f2f3f4] py-9">FAQs</routerLink>
     <div class="flex gap-8 items-center left-item">
      

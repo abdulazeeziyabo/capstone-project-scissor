@@ -16,6 +16,7 @@
         <div class="border-b border-[#D9D6D6]"></div>
       </div>
     </div>
+    <footerPage/>
   </div>
   </template>
   
@@ -23,6 +24,7 @@
   import { ref } from 'vue';
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
   import { faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
+import footerPage from '@/components/footer-page.vue';
   
   const openIndex = ref(null);
   

@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-[#ADD8E6] h-screen">
+  <div class="bg-[#1E3448] h-screen">
     <div v-if="!showQRCode">
       <div class="bg-[#1E3448] h-screen relative">
         <div>
@@ -50,17 +50,17 @@
     </div>
     <div v-else>
       <div class="max-w-4xl mx-auto">
-        <h3 class="font-bold text-4xl pl-7 pt-9 mb-4 text-center">Links</h3>
-        <div class="flex flex-col gap-5 mt-4 items-center bg-[#1E3448] pt-9 pb-6 rounded-lg">
-          <div class="flex justify-items:end gap-7 pl-4 items-center">
+        <h3 class="font-bold text-4xl pl-7 pt-9 mb-4 text-center text-white">Links</h3>
+        <div class="flex flex-col gap-5 mt-4 items-center  pt-9 pb-6 rounded-lg bg-[#ADD8E6]">
+          <div class="flex justify-items:end gap-7 pl-4 items-center ">
            <input type="text" readonly :value="shortenedLink"
            v-if="!editMode"
-           class="h-[54px] w-[420px] bg-[#1E3448] short">
-           <input type="text" v-model="editedShortenedUrl" class="h-[54px] w-[420px] bg-[#1E3448] short" v-if="editMode">
+           class="h-[54px] w-[420px] bg-[#ADD8E6] text-white short">
+           <input type="text" v-model="editedShortenedUrl" class="h-[54px] w-[420px] bg-[#ADD8E6] short" v-if="editMode">
             <div class="flex gap-8">
               <button
                 @click="copyToClipboard"
-                class="flex items-center bg-[#005AE2] w-[80px] px-3 py-2 rounded"
+                class="flex items-center w-[80px] px-3 py-2 rounded"
               >
                 <img src="../assets/images/copy.svg" alt="copy-img" class="tooltip" /><span
                   class="text-white"
@@ -71,7 +71,7 @@
                 <button
                 v-if="!editMode"
                 @click="handleEdit"
-                class="flex items-center bg-[#005AE2] w-[80px] px-3 py-2 rounded edit"
+                class="flex items-center w-[80px] px-3 py-2 rounded edit"
               >
                 <img src="../assets/images/edit-2.svg" alt="edit icon" /><span class="text-white"
                   >Edit</span
@@ -79,7 +79,7 @@
               </button>
               <button 
               v-if="editMode"
-              @click="saveEditedLink" class="flex items-center bg-[#005AE2] w-[80px] px-3 py-2 rounded save" >
+              @click="saveEditedLink" class="flex items-center text-white w-[80px] px-3 py-2 rounded save" >
   Save
 </button>
               </div>
@@ -100,7 +100,7 @@ class="flex items-center bg-[#005AE2] w-[100px] px-3 py-2 rounded"
           <div class="flex items-enter gap-6">
             <button
               @click="toggleShareOptions"
-              class="flex items-center bg-[#005AE2]border border px-3 py-2 rounded-full"
+              class="flex items-center border border px-3 py-2 bg-[#1E3448]rounded-full"
             >
               <img src="../assets/images/share.svg" alt="share-img" /><span class="text-white"
                 >Share link</span
@@ -108,7 +108,7 @@ class="flex items-center bg-[#005AE2] w-[100px] px-3 py-2 rounded"
             </button>
             <button
               @click="toggleQR"
-              class="flex items-center bg-[#005AE2]border border px-3 py-2 rounded-full"
+              class="flex items-center bg-[#1E3448]border border px-3 py-2 rounded-full"
             >
               <img src="../assets/images/qr-code-line.svg" alt="qrcode-img" /><span
                 class="text-white"
@@ -332,12 +332,12 @@ export default {
     handleEdit(){
 this.editedShortenedUrl = this.shortenedLink
 this.editMode = true;
+this.shortenedLink = editedShortenedLink;
     },
     saveEditedLink() {
     this.shortenedLink = this.editedShortenedLink;
     this.editMode = false;
     this.editedShortenedLink = '';
-    this.editedShortenedLink =this.shortenedLink;
   },
     handleDelete(index: any) {
       this.shortenedLink.splice(index, 1)

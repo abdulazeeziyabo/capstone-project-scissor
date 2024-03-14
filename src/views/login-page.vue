@@ -1,53 +1,3 @@
-<!-- <template>
-<div class="w-[462px] mx-auto mt-[122px] overscroll-contain overflow-x-none">
- <div class="font-semibold text-[#5c6f7f] text-center text-xm mb-3 mx-10">
-    Log in with:
- </div> 
- <div class="flex gap-8 items-center mb-5 w-[242px] mx-auto">
-<button class=" flex items-center gap-2 bg-[#005AE2]
- w-[109px] h-[40px] border rounded text-[#5c6f7f] text-base px-3 text-white"> <GLogo class=""/>Google</button> 
-
-<button class="flex items-center gap-2 bg-[#005AE2]
- w-[109px] h-[40px] border rounded text-[#5c6f7f] text-base px-3 text-white"><img src="../assets/images/appleLogo.png" alt="Apple Logo" class="w-[34px] h-[34px]">Apple</button>
- </div>
- <div class="text-center wrapper pl-3 mb-5 lowercase font-bold text-[#5C6F7F]">Or</div>
- <form action="" class="">
-    <div class="flex flex-col gap-4 h-full w-full">
-    <label for="email" ></label>
-    <input 
-    type="text" 
-    name="email" 
-    placeholder="Email address or username" class=" border-solid border-2 border-[#005AE2] rounded px-3 py-3"
-    v-model="user.email"/>
-    <label for="password" >
-    <button @click.prevent="handleShow" class="relative">
-    <ELogo class="absolute left-[420px] top-[40px]"/>
-    </button>
-    </label>
-    <input 
-    :type="showEye ? 'text' : 'password'" name="password" 
-    placeholder="Password" 
-    class=" border-solid border-2 border-[#005AE2] rounded px-3 py-3 "
-    v-model="user.password"/>
-    </div>
-    <div class="text-end font-medium text-[#4991FF] text-xm">Forgot your password?</div>
-    <button 
-    type="button"
-    @click.prevent="handleLogin"
-    class="border rounded-3xl w-full bg-[#005AE2] px-3 py-3 text-white text-center mt-4">Login</button>
-    <div class="text-center mt-5">
-    <div class="font-medium text-sm mb-5">
-    <p class="text-[#5C6F7F]">Don't have an account? <routerLink to="/sign-up" class="text-[#005AE2] ">Sign up</routerLink> </p>
-    </div>
-    <div class="mb-6">
-        <p class="text-[#A0B1C0] leading-4 font-medium text-sm">
-        By signing in with an account, you agree to Scissors <span class="text-[#5C6F7F]">Terms of Service, Privacy Policy </span> and <span class="text-[#5C6F7F]">Acceptable Use Policy.</span>
-    </p></div>
-    </div>
- </form>
-</div>
-<Footer />
-</template> -->
 <template>
     <div class="w-[462px] mx-auto mt-[122px]">
      <div class="font-semibold text-[#5c6f7f] text-center text-xm mb-3 mx-10">
@@ -72,8 +22,9 @@
         name="email" 
         placeholder="Enter your email address " 
         class=" border-solid border-2 border-[#005AE2] rounded px-3 py-3" v-model="v$.email.$model"/>
-        <small class="text-red-500 font-medium text-xs" v-if="v$.email.$errors.length">{{
-            v$.em.$errors[0].$message  }}</small>
+        <small class="text-red-500" v-if="v$.email.$errors.length">{{
+            v$.email.$errors[0].$message
+          }}</small>
         <label for="password" class="relative">
         <button @click.prevent="handleShow()" 
         class="relative">
@@ -141,7 +92,7 @@ const handleLoginWithApple = async () => {
         // Use signInWithPopup with AppleAuthProvider
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
-        console.lo(user);
+        console.log(user);
         if(user){
             router.push('/my-url')
         }

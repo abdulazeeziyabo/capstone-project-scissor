@@ -21,7 +21,7 @@ describe("Login test suite", () => {
 
     // Updates the <input> value and triggers an `input` event.
     // fireEvent.input() would make the test fail.
-    await fireEvent.update(emailInput, "Bob");
+    await fireEvent.update(emailInput, "iya");
     // await fireEvent.update(emailInput, "");
 
     getByText("Value is not a valid email address");

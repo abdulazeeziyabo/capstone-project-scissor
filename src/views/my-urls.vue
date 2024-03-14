@@ -49,9 +49,9 @@
       </div>
     </div>
     <div v-else>
-      <div class="max-w-4xl mx-auto">
+      <div class="max-w-4xl mx-auto bg-[url('../assets/images/aurora.svg')]  h-[100%] bg-cover bg-no-repeat">
         <h3 class="font-bold text-4xl pl-7 pt-9 mb-4 text-center text-white">Links</h3>
-        <div class="flex flex-col gap-5 mt-4 items-center  pt-9 pb-6 rounded-lg bg-[#ADD8E6]">
+        <div class="flex flex-col gap-5 mt-4 items-center  pt-9 pb-6 rounded-lg">
           <div class="flex justify-items:end gap-7 pl-4 items-center ">
            <input type="text" readonly :value="shortenedLink"
            v-if="!editMode"
@@ -100,7 +100,7 @@ class="flex items-center bg-[#005AE2] w-[100px] px-3 py-2 rounded"
           <div class="flex items-enter gap-6">
             <button
               @click="toggleShareOptions"
-              class="flex items-center border border px-3 py-2 bg-[#1E3448]rounded-full"
+              class="flex items-center px-3 py-2 bg-[#005AE2] rounded-full"
             >
               <img src="../assets/images/share.svg" alt="share-img" /><span class="text-white"
                 >Share link</span
@@ -108,7 +108,7 @@ class="flex items-center bg-[#005AE2] w-[100px] px-3 py-2 rounded"
             </button>
             <button
               @click="toggleQR"
-              class="flex items-center bg-[#1E3448]border border px-3 py-2 rounded-full"
+              class="flex items-center bg-[#005AE2] px-3 py-2 rounded-full"
             >
               <img src="../assets/images/qr-code-line.svg" alt="qrcode-img" /><span
                 class="text-white"
@@ -120,7 +120,7 @@ class="flex items-center bg-[#005AE2] w-[100px] px-3 py-2 rounded"
         <div v-if="showDBShareOptions">
           <div>
             <span @click="toggleShareOptions" class="cursor-pointer font-bold"> X</span>
-            <h3>Share link on social media</h3>
+            <h3 class="text-white">Share link on social media</h3>
             <div class="flex gap-4 items-center">
               <button @click="shareOnSocialMedia('facebook')">
                 <img src="../assets/images/social-facebook.svg" alt="facebook icon" />
@@ -137,7 +137,7 @@ class="flex items-center bg-[#005AE2] w-[100px] px-3 py-2 rounded"
         <div v-if="showQR">
           <div>
             <span @click="toggleQR"> </span>
-            <h4>Download QR Code</h4>
+            <h4 class="text-white">Download QR Code</h4>
             <QRCode
               :value="shortenedLink"
               :size="100"
@@ -161,7 +161,7 @@ class="flex items-center bg-[#005AE2] w-[100px] px-3 py-2 rounded"
               }"
               :backgroundOptions="{ color: '#ffffff' }"
               :cornersSquareOptions="{ type: 'dot', color: '#000000' }"
-              :cornersDotOptions="{ type: undefined, color: '#000000' }"
+              :cornersDotOptions="{ type: 'square', color: '#000000' }"
               fileExt="png"
               :download="true"
               myclass="my-qur"
@@ -173,7 +173,7 @@ class="flex items-center bg-[#005AE2] w-[100px] px-3 py-2 rounded"
         </div>
         <button
           @click="resetComponent"
-          class="bg-[#1E3448] border border px-3 py-2 rounded-full text-white mt-9 ml-[400px]"
+          class="bg-[#005AE2] px-3 py-2 rounded-full text-white mt-9 ml-[400px] mb-9"
         >
           Shorten another link
         </button>

@@ -6,9 +6,9 @@
           <img src="../assets/images/Logo.png">
         </div>
         <div class="flex gap-3 items-center">
-          <a href=""><img src="../assets/facebook-logo.svg" alt=" FaceBook Logo" class="w-[54px] h-[34px] cursor-pointer"></a>
-          <a href=""><img src="../assets/images/linkedin-logo.svg" alt="LinkedIn Logo" class="w-[34px] h-[34px] cursor-pointer" ></a>
-          <a href=""><img src="../assets/Xlogo.svg" alt="X Logo" class="w-[54px] h-[44px]"></a>
+          <a href=""><img src="../assets/images/social-facebook.svg" alt=" FaceBook Logo" class="w-[54px] h-[54px] cursor-pointer"></a>
+          <a href=""><img src="../assets/images/linkedin-logo.svg" alt="LinkedIn Logo" class="w-[54px] h-[54px] cursor-pointer" ></a>
+          <a href=""><img src="../assets/images/twitter.svg" alt="X Logo" class="w-[54px] h-[54px]"></a>
         </div>
         </div>
     </div>
@@ -26,8 +26,6 @@
 </template>
 
 <script setup lang="ts">
-import XLogo from '@/components/svg-components/twitterLogo.vue';
-import VLogo from '@/components/svg-components/VLogo.vue';
 </script>
 
 <style scoped>

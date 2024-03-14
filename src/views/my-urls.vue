@@ -22,6 +22,7 @@
                 placeholder="Paste your URL here..."
                 class="w-[374px] border border-[#3284FF] rounded-md leading-[18px] pl-7 h-[45px] mb-6 focus:border-[#3284FF] focus:border-none placeholder:text-[#4991FF]"
               />
+              <small v-if="error" class="text-red-500">{{ error }}</small>
               <small v-if="linkError" class="text-red-500">{{ linkError }} </small>
               <button
                 class="bg-[#3284FF] mt-4 w-[364px] h-[45px] border rounded-full text-white flex items-center gap-3 pl-[120px]"
@@ -51,8 +52,11 @@
       <div class="max-w-4xl mx-auto">
         <h3 class="font-bold text-4xl pl-7 pt-9 mb-4 text-center">Links</h3>
         <div class="flex flex-col gap-5 mt-4 items-center bg-[#1E3448] pt-9 pb-6 rounded-lg">
-          <div class="flex justify-items:end gap-9 items-center">
-            <p class="text-white">{{ shortenedLink }}</p>
+          <div class="flex justify-items:end gap-7 pl-4 items-center">
+           <input type="text" readonly :value="shortenedLink"
+           v-if="!editMode"
+           class="h-[54px] w-[420px] bg-[#1E3448] short">
+           <input type="text" v-model="editedShortenedUrl" class="h-[54px] w-[420px] bg-[#1E3448] short" v-if="editMode">
             <div class="flex gap-8">
               <button
                 @click="copyToClipboard"
@@ -63,22 +67,30 @@
                   >Copy</span
                 >
               </button>
-              <button
+              <div class="edit-items flex gap-3">
+                <button
+                v-if="!editMode"
                 @click="handleEdit"
-                class="flex items-center bg-[#005AE2] w-[80px] px-3 py-2 rounded"
+                class="flex items-center bg-[#005AE2] w-[80px] px-3 py-2 rounded edit"
               >
                 <img src="../assets/images/edit-2.svg" alt="edit icon" /><span class="text-white"
                   >Edit</span
                 >
               </button>
-              <button
-                @click="handleDelete(index)"
-                class="flex items-center bg-[#005AE2] w-[100px] px-3 py-2 rounded"
+              <button 
+              v-if="editMode"
+              @click="saveEditedLink" class="flex items-center bg-[#005AE2] w-[80px] px-3 py-2 rounded save" >
+  Save
+</button>
+              </div>
+<button
+@click="handleDelete(index)"
+class="flex items-center bg-[#005AE2] w-[100px] px-3 py-2 rounded"
               >
-                <img src="../assets/images/trash.svg" alt="delete icon" /><span class="text-white"
-                  >Delete</span
-                >
-              </button>
+<img src="../assets/images/trash.svg" alt="delete icon" /><span class="text-white"
+>Delete</span
+>
+</button>
             </div>
           </div>
           <div>
@@ -173,16 +185,46 @@
 <script lang="ts">
 import { ref, set, serverTimestamp, push } from 'firebase/database'
 import { generateShortUrlKey } from '@/utils/shortKey'
-import { database } from '@/utils/firebase'
+import { database } from '@/utils/firebase';
+import {DefineComponent} from 'vue';
 import { toast } from 'vue3-toastify'
 import QRCode from 'qrcode-vue3'
 
-export default {
+interface ComponentProps{
+    createdAt: string;
+  } 
+  interface ComponentMethods {
+  formatCreationTime: () => string;
+}
+
+interface ComponentData {
+  longUrl: string;
+  customAlias: string;
+  customDomain: string;
+  domains: string[];
+  error: string;
+  linkError: string;
+  shortenedLink: string;
+  linkCollectionsRef: any; 
+  showQRCode: boolean;
+  showDBShareOptions: boolean;
+  showQR: boolean;
+  createAt: any; 
+  editedShortenedUrl: string;
+  editMode: boolean;
+}
+
+type MyComponent = DefineComponent<ComponentProps, ComponentData, ComponentMethods>;
+
+export default { 
   name: 'URLShortener',
-  components: {
-    QRCode
+  components:{
+    QRCode,
   },
-  data() {
+  props:{
+    createdAt:String
+  },
+  data(): ComponentData{ {
     return {
       longUrl: '',
       customAlias: '',
@@ -196,9 +238,10 @@ export default {
       showDBShareOptions: false,
       showQR: false,
       createAt: null,
-      editedShortenedUrl: '',
+      editedShortenedUrl: false,
       editMode: false
     }
+}
   },
   created() {
     this.linkCollectionsRef = ref(database, 'linkCollections')
@@ -228,7 +271,7 @@ export default {
           shortUrlKey: shortUrlKey,
           createdAt: serverTimestamp()
         }
-        await set(linkRef, newLink) // Set the data at the new child node
+        await set(linkRef, newLink)
 
         // Update UI with shortened link
         this.shortenedLink = shortUrlKey
@@ -250,20 +293,18 @@ export default {
       }
     },
     //share on social media
-    shareOnSocialMedia(platform: string) {
-      const shortenedLink = ''
-      const url = encodeURIComponent(shortenedLink.value)
-      const text = encodeURIComponent('Check out this link')
+    shareOnSocialMedia(platform: string): void {
+      const url = encodeURIComponent(this.shortenedLink)
       let shareUrl = ''
       switch (platform) {
         case 'twitter':
-          shareUrl = `https://twitter.com/`
+          shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=Check+out+this+link`
           break
         case 'facebook':
-          shareUrl = `https://www.facebook.com`
+          shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`
           break
         case 'instagram':
-          shareUrl = `https://instagram.com`
+          shareUrl = `https://www.instagram.com/`
           break
         default:
           return
@@ -288,28 +329,23 @@ export default {
       this.customAlias = ''
       this.showQRCode = false
     },
-    toggleEditMode() {
-      // Toggle edit mode
-      this.editMode = !this.editMode
-      // If entering edit mode, store the original value for potential cancelation
-      if (this.editMode) {
-        this.editedShortenedUrl = this.shortenedLink
-      }
+    handleEdit(){
+this.editedShortenedUrl = this.shortenedLink
+this.editMode = true;
     },
-    saveChanges() {
-      // Save the changes to the shortened URL
-      this.shortenedLink = this.editedShortenedUrl
-      // Exit edit mode
-      this.editMode = false
-      // Here you can update the shortened URL in the database if needed
-    },
+    saveEditedLink() {
+    this.shortenedLink = this.editedShortenedLink;
+    this.editMode = false;
+    this.editedShortenedLink = '';
+    this.editedShortenedLink =this.shortenedLink;
+  },
     handleDelete(index: any) {
       this.shortenedLink.splice(index, 1)
     }
   },
+  // Computed property to format creation time
   computed: {
-    // Computed property to format creation time
-    formatCreationTime() {
+    formatCreationTime():string {
       if (this.createdAt) {
         const creationDate = new Date(this.createdAt)
         return creationDate.toLocaleString() // Adjust the format as needed
@@ -321,59 +357,17 @@ export default {
 </script>
 
 <style scoped>
-a.router-link-exact-active {
-  color: #005ae2;
+.short{
+outline: none;
+color: white;
 }
-.hamburger {
-  display: none;
-  cursor: pointer;
+.edit-items{
+  font-size: 18px;
+  animation-duration:0.2s
+    
 }
-.bar {
-  display: block;
-  width: 25px;
-  height: 3px;
-  margin: 5px auto;
-  -webkit-transition: all 0.3s ease-in-out;
-  transition: all 0.3s ease-in-out;
-  background-color: blue;
-}
-@media (max-width: 1000px) {
-  .hamburger {
-    display: block;
-  }
-  .hamburger.active .bar:nth-child(2) {
-    opacity: 0;
-  }
-  .hamburger.active .bar:nth-child(1) {
-    transform: translateY(8px) rotate(45deg);
-  }
-  .hamburger.active .bar:nth-child(3) {
-    transform: translateY(-8px) rotate(-45deg);
-  }
-  .middle-nav {
-    position: absolute;
-    left: -120%;
-    top: 70px;
-    gap: 0;
-    flex-direction: column;
-    background-color: #071827;
-    width: 100%;
-    text-align: center;
-    transition: 0.3s;
-  }
-  .middle-nav.active {
-    left: 0;
-  }
-  .middle-nav a {
-    color: white;
-    padding: 6px 0;
-    margin: 0px 20px;
-    text-align: center;
-    transition: all 0.5s ease;
-  }
-  a {
-    border-bottom: none;
-    padding-left: 2px;
-  }
+.save{
+    display: flex;
+  align-items: center; 
 }
 </style>

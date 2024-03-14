@@ -55,7 +55,7 @@
           <div class="flex justify-items:end gap-7 pl-4 items-center ">
            <input type="text" readonly :value="shortenedLink"
            v-if="!editMode"
-           class="h-[54px] w-[420px] bg-[#ADD8E6] text-white short">
+           class="h-[54px] w-[420px] bg-[#1E3448] text-white short">
            <input type="text" v-model="editedShortenedUrl" class="h-[54px] w-[420px] bg-[#ADD8E6] short" v-if="editMode">
             <div class="flex gap-8">
               <button

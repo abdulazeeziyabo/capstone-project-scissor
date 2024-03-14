@@ -83,6 +83,7 @@
          <p>Receive data on the usage of either your shortened URL, custom URLs or generated QR codes. Embedded to
            monitor progress.</p>
        </div>
+       <Footer/>
     </div>
      </div>
     </div> 
@@ -94,6 +95,7 @@
  <script setup lang="ts">
  import Ellipse from "@/components/svg-components/Ellipse-page.vue"
  import LoadingMockup from "@/components/loading-mockup.vue";
+ import Footer from '../components/footer-page.vue'
  import { ref } from "vue";
  import { useRouter } from "vue-router";
  const router = useRouter()

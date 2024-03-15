@@ -10,14 +10,18 @@
     <routerLink to="/faqs-page"  class="flex items-center h-full border-b-[3px] border-[#f2f3f4] py-9">FAQs</routerLink>
     <div class="flex gap-8 items-center left-item">
      
-     <routerLink  
+     <div class="container flex items-center gap-6">
+        <div class="login-conatiner">
+        <routerLink  
      @click = "handleLogin"
       to="/login-page" 
      class="flex items-center h-[44px] border-b-[3px] border-[#f2f3f4]  w-[130px] pl-2   cursor-pointer hover:bg-[]login">Login</routerLink>
-    <routerLink v-if="!isLoggedIn" to="/sign-up" class="flex items-center h-[44px]   max-w-[200px] pl-5 pr-5 border text-white border-[#005AE2] bg-[#005AE2] text-center rounded-full cursor-pointer hover:bg-[#071827] singup">Signup for free</routerLink>
-     <button v-else 
-     @click="handleLogout"
-      class="flex items-center h-[44px] border-b-[3px] border-[#f2f3f4]  w-[140px] pl-7 border border-[#005AE2] bg-[#005AE2] text-center rounded-full cursor-pointer text-white hover:bg-[#071827]" >Sign Out</button>
+     </div>
+   <div class="signup-container">
+    <routerLink to="/sign-up" class="flex items-center h-[44px]   max-w-[200px] pl-5 pr-5 border text-white border-[#005AE2] bg-[#005AE2] text-center rounded-full cursor-pointer hover:bg-[#071827] singup">Signup for free</routerLink>
+   </div>
+    
+     </div>
     </div>
     </div>
     
@@ -66,7 +70,9 @@
    </script>
    <style scoped>
    a.router-link-exact-active{
-     color:  #005AE2;
+     color:  rebeccapurple;
+     font-size: large;
+     font: 30px;
    }
    .hamburger{
      display: none;
@@ -125,16 +131,19 @@
    .left-item{
      display: block;
      text-align: center;
-     padding: 10px 0;
-     margin-right: -90px;
-    
+     margin-right: -90px; 
    }
-   .signup{
-     padding-left: 3px;
-   text-align: center;
+   .container{
+    display: block;
+    align-items: center;
+    margin-top: -10px;
+    margin-left: 30px;
    }
-   .login{
-     margin-bottom: 20px;
+   .signup-container{
+    margin-top: 60px;
+    margin-bottom: 20px;
+    margin-right: 50px;
+    padding-right: 10px;
    }
    }
    @media (max-width:720px) {

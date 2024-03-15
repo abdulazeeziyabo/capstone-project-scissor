@@ -210,7 +210,7 @@ interface ComponentData {
   showDBShareOptions: boolean;
   showQR: boolean;
   createAt: any; 
-  editedShortenedUrl: string;
+  editedShortenedUrl: boolean;
   editMode: boolean;
 }
 

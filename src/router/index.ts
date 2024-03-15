@@ -5,7 +5,7 @@ import HomePage from '@/views/home-page.vue';
 import Login from '@/views/login-page.vue'
 import MyUrls from '@/views/my-urls.vue';
 import NotFound from '@/views/not-found.vue';
-
+import Analytics from '@/components/analytics-page.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,17 +26,10 @@ const router = createRouter({
           component: () => import('@/views/faqs-page.vue')
         },
         {
-          path: '/analytics-page',
-          name: 'analytics-page',
-          component: () => import('@/views/analytics-page.vue')
-        },
-        
-        {
           path: '/price-page',
           name: 'price-page',
           component: () => import('@/views/price-page.vue')
         },
-        
         {
           path: '/home-page',
           name: 'home-page',
@@ -72,13 +65,13 @@ const router = createRouter({
          
         },
         {
-          path: '/analytics-page',
+          path: '/analytics-page/:id',
           name: 'analytics-page',
-          component: () => import('@/views/analytics-page.vue'),
+          component: Analytics,
+          props:true
          
         },
 
-        
       ]
     }
     

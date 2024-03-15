@@ -20,8 +20,3 @@ export async function getAnalyticsData() {
         throw error;
       }
 }
-
-// Log an event to Firebase Analytics
-function logAnalyticsEvent(eventName, eventData) {
-  logEvent(analytics, eventName, eventData);
-}

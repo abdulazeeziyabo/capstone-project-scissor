@@ -50,7 +50,24 @@
            @click.prevent="shorten">Trim URLs
            <img src="../assets/images/magic wand.png" alt="magic wand">
           </button>
-          <a :href="shortenedLink" target="_blank" rel="noopener noreferrer" class="text-[#4991FF] mt-6">{{ shortenedLink }}</a>
+          <div v-if="shortenedLinks.length > 0" class="mt-4">
+        <ul>
+          <li v-for="shortenedLink in shortenedLinks" :key="shortenedLink.id" class="text-[#4991FF] font-semibold text-xl">
+            <div>
+                <!-- Display shortened link -->
+            <a :href="shortenedLink.shortenedUrl">Shortened URL: {{ shortenedLink.shortenedUrl }}</a>
+            <!-- Display analytics data -->
+           <p> Visits: {{ shortenedLink.analytics.visits }}</p>
+            </div>
+            <!-- Display referral sources -->
+            <ul v-if="shortenedLink.analytics.referrers.length > 0">
+              <li v-for="referrer in shortenedLink.analytics.referrers" :key="referrer">
+                Referrer: {{ referrer }}
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
           <p class="text-[#4991FF] text-xm mt-6">
               By clicking Trim URL, I agree to the <span class="font-semibold">Terms of services, Privacy Policy</span> and Use of Cookies.
           </p>
@@ -78,15 +95,17 @@
           domains: ['scissor.com', 'scisssor.org', 'scissor.store', 'scissor.net'],
           error: '',
           linkError: '',
-          shortenedLink: '',
-          linkCollectionsRef: null, // Initialize this in the created hook
+          shortenedLinks: [],
+          linkCollectionsRef: null, 
         };
       },
       created() {
         this.linkCollectionsRef = ref(database, 'linkCollections');
+        this.fetchShortenedLinks();
       },
       methods: {
         async shorten() {
+             // Validate URL
           this.error = '';
           if (!this.longUrl) {
             this.error = 'Please enter a long URL to shorten.';
@@ -103,26 +122,77 @@
             if (!shortUrlKey) {
               throw new Error('Short URL key is undefined');
             }
-    
+     // Store new shortened link in Firebase
             const linkRef = push(this.linkCollectionsRef); // Create a reference to a new child nod
            const newLink = {
               longUrl: this.longUrl,
               shortUrlKey: shortUrlKey,
               createdAt: serverTimestamp(),
+              analytics: { visits: 0, referrers:[] },
             };
             await set(linkRef, newLink); // Set the data at the new child node
     
             // Update UI with shortened link
-            this.shortenedLink = `https://${shortUrlKey}/#${domain.value}/${customAlias.value}`;
+            this.shortenedLinks.push({ id: linkRef.key, shortenedUrl: `https://${shortUrlKey}/${domain.value}/${customAlias.value}`, analytics: newLink.analytics });
             toast.success('Success.');
           } catch (error) {
             console.error('Error storing link:', error);
             toast.error('Failed to shorten the link. Try again.');
           }
         },
+        async fetchShortenedLinks() {
+      try {
+        const snapshot = await ref(this.linkCollectionsRef).get();
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          Object.keys(data).forEach((key) => {
+            this.shortenedLinks.push({ id: key, shortenedUrl: `https://${data[key].shortUrlKey}`, analytics: data[key].analytics });
+          });
+        }
+      }  catch (error) {
+        console.error('Error fetching shortened links:', error);
+
+      // Handle any errors that occur during the process
+    }
+  }
       },
     };
     </script>
       <style scoped>
      
       </style>
+
+<!-- <template>
+    <div class="bg-[#1E3448] h-screen relative">
+      <div>
+        < Your existing HTML -->
+        <!-- <form @submit.prevent="shorten">
+          <! Input fields for URL and domain selection -->
+        <!-- </form>
+        <div v-if="shortenedLinks.length > 0">
+          <ul>
+            <li v-for="shortenedLink in shortenedLinks" :key="shortenedLink.id">
+              <!Display shortened link -->
+              <!-- Shortened URL: {{ shortenedLink.shortenedUrl }} -->
+              <!-- Display analytics data -->
+              <!-- Visits: {{ shortenedLink.analytics.visits }} -->
+              <!-- Display referral sources -->
+              <!-- <ul v-if="shortenedLink.analytics.referrers.length > 0">
+                <li v-for="referrer in shortenedLink.analytics.referrers" :key="referrer">
+                  Referrer: {{ referrer }}
+                </li>
+              </ul>
+            <! </li> --> 
+          <!-- </ul>
+        </div>
+      </div>
+    </div>
+  </template> -->
+  
+  <!-- <script lang="ts">
+  import { ref, set, serverTimestamp, push } from 'firebase/database';
+  import { generateShortUrlKey } from '@/utils/shortKey';
+  import { database } from '@/utils/firebase';
+  import { toast } from 'vue3-toastify';
+  
+  export  -->

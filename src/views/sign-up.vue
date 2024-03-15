@@ -4,8 +4,10 @@
         Sign up with:
      </div> 
      <div class="flex gap-8 items-center mb-5 w-[242px] mx-auto">
-            <button class=" flex items-center gap-2 bg-[#005AE2]
-     w-[109px] h-[40px] border rounded text-[#5c6f7f] text-base px-3 text-white"> <GLogo class=""/>Google</button> 
+            <button 
+            @click="handleGoogleLogin"
+            class=" flex items-center gap-2 bg-[#005AE2]
+     w-[109px] h-[40px] border rounded text-[#5c6f7f] text-base px-3 text-white"> <GLogo />Google</button> 
     
         <button class="flex items-center gap-2 bg-[#005AE2]
      w-[109px] h-[40px] border rounded text-[#5c6f7f] text-base px-3 text-white"><img src="../assets/images/appleLogo.png" alt="Apple Logo" class="w-[34px] h-[34px]">Apple</button>
@@ -63,7 +65,7 @@
     import GLogo from '@/components/svg-components/GLogo.vue'
     import Footer from '../components/footer-page.vue'
     import ELogo from '../components/svg-components/E-logo.vue';
-    import {createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
+    import {createUserWithEmailAndPassword, getAuth,signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
     import { ref, reactive, computed } from 'vue';
     import { useRouter } from 'vue-router';
     import { toast } from "vue3-toastify";
@@ -89,6 +91,23 @@
       },
     };
     const v$ = useVuelidate(userRules, user);
+
+    //signin in with google
+const provider = new GoogleAuthProvider();
+const auth = getAuth();
+const handleGoogleLogin = async () => {
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+    console.log(user);
+    if(user){
+        router.push("/my-urls")
+    }
+  } catch (error) {
+    console.error('Error loggin:', error);
+        toast.error('Failed to login with google. Try again.');
+  }
+};
     
        const handleSubmit = async()=>{
         const auth = getAuth();

@@ -10,9 +10,9 @@
      w-[109px] h-[40px] border rounded text-[#5c6f7f] text-base px-3 text-white"> <GLogo class=""/>Google</button> 
     
         <button 
-        @click="handleLoginWithApple"
+        @click="handleLoginWithFacebook"
         class="flex items-center gap-2 bg-[#005AE2]
-     w-[109px] h-[40px] border rounded text-[#5c6f7f] text-base px-3 text-white"><img src="../assets/images/appleLogo.png" alt="Apple Logo" class="w-[34px] h-[34px]">Apple</button>
+     w-[109px] h-[40px] border rounded text-[#5c6f7f] text-base px-3 text-white"><img src="../assets/images/social-facebook.svg" alt="Apple Logo" class="w-[34px] h-[34px]">Facebook</button>
      </div>
      <div class="text-center wrapper pl-3 mb-5 lowercase text-sm text-[#5C6F7F] font-bold">Or</div>
      <form action="" class="">
@@ -20,7 +20,7 @@
         <label for="email" ></label>
         <input type="text" 
         name="email" 
-        placeholder="Enter your email address " 
+        placeholder="Enter your email address or username " 
         class=" border-solid border-2 border-[#005AE2] rounded px-3 py-3" v-model="v$.email.$model"/>
         <small class="text-red-500" v-if="v$.email.$errors.length">{{
             v$.email.$errors[0].$message
@@ -51,7 +51,7 @@
     </template>
 
 <script setup lang="ts" >
-import {signInWithEmailAndPassword, getAuth,signInWithPopup, GoogleAuthProvider, OAuthProvider} from 'firebase/auth';
+import {signInWithEmailAndPassword, getAuth,signInWithPopup, GoogleAuthProvider, FacebookAuthProvider} from 'firebase/auth';
 import { useRouter } from 'vue-router';
 import {reactive, ref} from 'vue';
 import { toast } from "vue3-toastify";
@@ -61,10 +61,14 @@ import GLogo from '@/components/svg-components/GLogo.vue';
 import Footer from '../components/footer-page.vue';
 import ELogo from '../components/svg-components/E-logo.vue';
 
+interface userTpye{
+        email: string;
+        password:string;
+    }
 
 const router = useRouter();
    const showEye = ref(false)
-   const user = reactive({
+   const user = reactive<userTpye>({
     email: '',
     password: ''
    });
@@ -85,9 +89,9 @@ const handleGoogleLogin = async () => {
         toast.error('Failed to login with google. Try again.');
   }
 };
-//login with apple
-const handleLoginWithApple = async () => {
-    const provider = new OAuthProvider('apple.com')
+//login with facebook
+const handleLoginWithFacebook = async () => {
+    const provider = new FacebookAuthProvider()
     try {
         // Use signInWithPopup with AppleAuthProvider
         const result = await signInWithPopup(auth, provider);

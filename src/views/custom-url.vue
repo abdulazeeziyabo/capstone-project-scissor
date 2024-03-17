@@ -3,7 +3,7 @@
     </div>
         <div class="bg-[#1E3448] h-screen relative ">
             <div>
-          <button  class="flex items-center gap-3 tracking-[1.8px] text-[#59636E] text-xs font-bold uppercase pt-9 pl-9 cursor-pointer" @click="$router.go(-1)">
+          <button  class="flex items-center gap-3 tracking-[1.8px] text-[#59636E] text-xs font-bold uppercase pt-9 pl-9 cursor-pointer mb-5" @click="$router.go(-1)">
               <svg
               xmlns="http://www.w3.org/2000/svg"
               width="8"
@@ -61,8 +61,8 @@
             </div>
             <!-- Display referral sources -->
             <ul v-if="shortenedLink.analytics.referrers.length > 0">
-              <li v-for="referrer in shortenedLink.analytics.referrers" :key="referrer">
-                Referrer: {{ referrer }}
+              <li v-for="(referrer, visits) in shortenedLink.analytics.referrers" :key="referrer">
+                Referrer: {{ referrer }} {{ visits }}
               </li>
             </ul>
           </li>
@@ -81,28 +81,52 @@
       
       <script lang="ts">
     import { getDatabase, ref, set, serverTimestamp, push } from 'firebase/database';
+    import { getAnalytics, logEvent } from "firebase/analytics";
     import { generateShortUrlKey } from '@/utils/shortKey';
     import { database } from '@/utils/firebase';
     import { toast } from 'vue3-toastify';
     
-    export default {
-      name: 'URLShortener',
-      data() {
-        return {
-          longUrl: '',
-          customAlias: '',
-          customDomain: 'Choose your domain',
-          domains: ['scissor.com', 'scisssor.org', 'scissor.store', 'scissor.net'],
-          error: '',
-          linkError: '',
-          shortenedLinks: [],
-          linkCollectionsRef: null, 
-        };
-      },
-      created() {
-        this.linkCollectionsRef = ref(database, 'linkCollections');
-        this.fetchShortenedLinks();
-      },
+    interface ComponentProps{
+    createdAt: string;
+  } 
+  interface ComponentMethods {
+  formatCreationTime: () => string;
+}
+
+interface ComponentData {
+  longUrl: string;
+  customAlias: string;
+  customDomain: string;
+  domains: string[];
+  error: string;
+  linkError: string;
+  shortenedLink: string;
+  linkCollectionsRef: any; 
+  shortenedLinks: string[];
+}
+
+export default { 
+  name: 'URLShortener',
+  props:{
+    createdAt:String
+  },
+  data(): ComponentData{ {
+    return {
+      longUrl: '',
+      customAlias: '',
+      customDomain: 'scissor.io',
+      domains: ['scissor.com', 'scisssor.org', 'scissor.store', 'scissor.net'],
+      error: '',
+      linkError: '',
+      shortenedLink: '',
+      linkCollectionsRef: null,
+      shortenedLinks:[],
+    }
+}
+  },
+  created() {
+    this.linkCollectionsRef = ref(database, 'linkCollections')
+  },
       methods: {
         async shorten() {
              // Validate URL
@@ -128,10 +152,12 @@
               longUrl: this.longUrl,
               shortUrlKey: shortUrlKey,
               createdAt: serverTimestamp(),
-              analytics: { visits: 0, referrers:[] },
+              analytics: { visits: 0, referrers:{}},
             };
             await set(linkRef, newLink); // Set the data at the new child node
-    
+            
+            const analytics = getAnalytics();
+        logEvent(analytics, 'url_shortened', { longUrl: this.longUrl });
             // Update UI with shortened link
             this.shortenedLinks.push({ id: linkRef.key, shortenedUrl: `https://${shortUrlKey}/${domain.value}/${customAlias.value}`, analytics: newLink.analytics });
             toast.success('Success.');
@@ -140,59 +166,39 @@
             toast.error('Failed to shorten the link. Try again.');
           }
         },
-        async fetchShortenedLinks() {
-      try {
-        const snapshot = await ref(this.linkCollectionsRef).get();
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-          Object.keys(data).forEach((key) => {
-            this.shortenedLinks.push({ id: key, shortenedUrl: `https://${data[key].shortUrlKey}`, analytics: data[key].analytics });
-          });
-        }
-      }  catch (error) {
-        console.error('Error fetching shortened links:', error);
+        async handleShortenedLinkClick(shortenedLinkId) {
+    // Retrieve the shortened link from the database
+    const linkSnapshot = await ref(database, `linkCollections/${shortenedLinkId}`).get();
+    if (linkSnapshot.exists()) {
+      const linkData = linkSnapshot.val();
 
-      // Handle any errors that occur during the process
+      // Increment visit count
+      linkData.analytics.visits++;
+      const referralSource = this.detectReferralSource(); // Implement this function to detect referral source
+      if (referralSource) {
+        if (!linkData.analytics.referrers[referralSource]) {
+          linkData.analytics.referrers[referralSource] = 1;
+        } else {
+          linkData.analytics.referrers[referralSource]++;
+        }
+      }
+
+      // Update analytics data in the database
+      await set(ref(database, `linkCollections/${shortenedLinkId}/analytics`), linkData.analytics);
+
+      // Redirect the user to the original URL
+      window.location.href = linkData.longUrl;
+    } else {
+      // Handle error: Shortened link not found
+      console.error('Error shorten link not found:', error);
+            toast.error('Failed to find shorten the link. Try again.');
     }
   }
       },
-    };
+    }
+
     </script>
       <style scoped>
      
       </style>
 
-<!-- <template>
-    <div class="bg-[#1E3448] h-screen relative">
-      <div>
-        < Your existing HTML -->
-        <!-- <form @submit.prevent="shorten">
-          <! Input fields for URL and domain selection -->
-        <!-- </form>
-        <div v-if="shortenedLinks.length > 0">
-          <ul>
-            <li v-for="shortenedLink in shortenedLinks" :key="shortenedLink.id">
-              <!Display shortened link -->
-              <!-- Shortened URL: {{ shortenedLink.shortenedUrl }} -->
-              <!-- Display analytics data -->
-              <!-- Visits: {{ shortenedLink.analytics.visits }} -->
-              <!-- Display referral sources -->
-              <!-- <ul v-if="shortenedLink.analytics.referrers.length > 0">
-                <li v-for="referrer in shortenedLink.analytics.referrers" :key="referrer">
-                  Referrer: {{ referrer }}
-                </li>
-              </ul>
-            <! </li> --> 
-          <!-- </ul>
-        </div>
-      </div>
-    </div>
-  </template> -->
-  
-  <!-- <script lang="ts">
-  import { ref, set, serverTimestamp, push } from 'firebase/database';
-  import { generateShortUrlKey } from '@/utils/shortKey';
-  import { database } from '@/utils/firebase';
-  import { toast } from 'vue3-toastify';
-  
-  export  -->

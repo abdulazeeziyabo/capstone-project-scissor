@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-[#1E3448] h-screen">
+  <div class="bg-[url('../assets/images/aurora.svg')] h-screen" bg-cover bg-no-repeat>
     <div v-if="!showQRCode">
       <div class="bg-[#1E3448] h-screen relative">
         <div>
@@ -49,7 +49,7 @@
       </div>
     </div>
     <div v-else>
-      <div class="max-w-4xl mx-auto bg-[url('../assets/images/aurora.svg')]  h-[100%] bg-cover bg-no-repeat">
+      <div class="max-w-4xl mx-auto bg-[#1E3448]  h-[100%] border rounded-lg pt-9 ">
         <h3 class="font-bold text-4xl pl-7 pt-9 mb-4 text-center text-white">Links</h3>
         <div class="flex flex-col gap-5 mt-4 items-center  pt-9 pb-6 rounded-lg">
           <div class="flex justify-items:end gap-7 pl-4 items-center ">
@@ -85,7 +85,7 @@
               </div>
 <button
 @click="handleDelete(index)"
-class="flex items-center bg-[#005AE2] w-[100px] px-3 py-2 rounded"
+class="flex items-center w-[100px] px-3 py-2 rounded"
               >
 <img src="../assets/images/trash.svg" alt="delete icon" /><span class="text-white"
 >Delete</span
@@ -186,7 +186,6 @@ class="flex items-center bg-[#005AE2] w-[100px] px-3 py-2 rounded"
 import { ref, set, serverTimestamp, push } from 'firebase/database'
 import { generateShortUrlKey } from '@/utils/shortKey'
 import { database } from '@/utils/firebase';
-import {DefineComponent} from 'vue';
 import { toast } from 'vue3-toastify'
 import QRCode from 'qrcode-vue3'
 
@@ -213,8 +212,6 @@ interface ComponentData {
   editedShortenedUrl: boolean;
   editMode: boolean;
 }
-
-type MyComponent = DefineComponent<ComponentProps, ComponentData, ComponentMethods>;
 
 export default { 
   name: 'URLShortener',

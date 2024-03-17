@@ -15,10 +15,10 @@
      <div class="text-center wrapper pl-3 mb-5 lowercase text-sm text-[#5C6F7F] font-bold">Or</div>
      <form action="" class="">
         <div class="flex flex-col gap-4 h-full w-full">
-            <!-- <label for="username"></label>
-        <input type="text" name="username" placeholder="Username" class=" border-solid border-2 border-[#005AE2] rounded px-3 py-3" v-model="user.username" />
-        <small class="text-red-500 font-medium text-xs" v-if="v$.username.$errors.length">{{
-                v$.username.$errors[0].$message  }}</small> -->
+             <label for="username"></label>
+        <input type="text" name="username" placeholder="Username" class=" border-solid border-2 border-[#005AE2] rounded px-3 py-3" v-model="user.userName" />
+        <small class="text-red-500 font-medium text-xs" v-if="v$.userName.$errors.length">{{
+                v$.userName.$errors[0].$message  }}</small> 
             <label for="email" ></label>
         <input type="text" name="email" placeholder="Email " class=" border-solid border-2 border-[#005AE2] rounded px-3 py-3" v-model="v$.email.$model"/>
         <small class="text-red-500 font-medium text-xs" v-if="v$.email.$errors.length">{{v$.email.$errors[0].$message  }}</small>
@@ -65,23 +65,32 @@
     import GLogo from '@/components/svg-components/GLogo.vue'
     import Footer from '../components/footer-page.vue'
     import ELogo from '../components/svg-components/E-logo.vue';
-    import {createUserWithEmailAndPassword, getAuth,signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+    import {createUserWithEmailAndPassword, getAuth,signInWithPopup, GoogleAuthProvider, updateProfile } from 'firebase/auth';
     import { ref, reactive, computed } from 'vue';
     import { useRouter } from 'vue-router';
     import { toast } from "vue3-toastify";
     import { useVuelidate } from "@vuelidate/core";
     import { required, email, minLength, sameAs } from "@vuelidate/validators";
     
+    interface userTpye{
+        userName: string;
+        email: string;
+        password:string;
+        confirmPassword:string
+    }
     const router = useRouter();
     const showEye = ref(false)
-    const showEyeConfirmPassword =ref(false)
-    const user = reactive({
+    const showEyeConfirmPassword =ref(false);
+
+    const user = reactive<userTpye>({
+        userName: '',
         email: "",
         password: "",
        confirmPassword: "",
        });
       const isSubmitting = ref(false);
     const userRules = {
+        userName:{required},
       email: { required, email },
       password: { required, minLength: minLength(8) },
       confirmPassword: {
@@ -109,26 +118,40 @@ const handleGoogleLogin = async () => {
   }
 };
     
-       const handleSubmit = async()=>{
-        const auth = getAuth();
-        const isValid = await v$.value.$validate();
-      if (!isValid) return;
-        try{
-    const response = await createUserWithEmailAndPassword(
-        auth, user.email, user.password
-    );
-    console.log(response);
-    if(response.user){
-        localStorage.setItem("isLoggedIn", "true");
-    router.push("/my-urls")
-    }
-        }catch(error:any){
-            console.log(error);
-            toast.error(error.message)
-        }finally{
-            isSubmitting.value = false;
+const handleSubmit = async () => {
+    const auth = getAuth();
+    const isValid = await v$.value.$validate();
+    
+    if (!isValid) return;
+
+    try {
+        const response = await createUserWithEmailAndPassword(
+            auth,
+            user.email,
+            user.password
+        );
+
+        if (response.user) {
+            const currentUser = auth.currentUser;
+            if (currentUser) {
+                // Ensure currentUser is not null before updating profile
+                await updateProfile(currentUser, {
+                    displayName: user.userName
+                });
+            }
+
+            localStorage.setItem("isLoggedIn", "true");
+            router.push("/my-urls");
         }
-       }
+    } catch (error:any) {
+        console.log(error);
+        toast.error(error.message);
+    } finally {
+        isSubmitting.value = false;
+    }
+}
+
+
        const handleShow = (word:string)=>{
         if(word === 'password'){
         showEye.value = !showEye.value}

@@ -3,7 +3,7 @@
      <div class="font-semibold text-[#5c6f7f] text-center text-xm mb-3 mx-10">
         Login with:
      </div> 
-     <div class="flex gap-8 items-center mb-5 w-[242px] mx-auto">
+     <div class="flex gap-8 items-center mb-5 w-[442px] mx-auto ml-[80px]">
             <button 
             @click="handleGoogleLogin"
             class=" flex items-center gap-2 bg-[#005AE2]
@@ -12,7 +12,7 @@
         <button 
         @click="handleLoginWithFacebook"
         class="flex items-center gap-2 bg-[#005AE2]
-     w-[109px] h-[40px] border rounded text-[#5c6f7f] text-base px-3 text-white"><img src="../assets/images/social-facebook.svg" alt="Apple Logo" class="w-[34px] h-[34px]">Facebook</button>
+     w-[170px] h-[40px] border rounded text-[#5c6f7f] text-base px-3 text-white"><img src="../assets/images/social-facebook.svg" alt="Facebook Logo" class="w-[34px] h-[34px]">Facebook</button>
      </div>
      <div class="text-center wrapper pl-3 mb-5 lowercase text-sm text-[#5C6F7F] font-bold">Or</div>
      <form action="" class="">

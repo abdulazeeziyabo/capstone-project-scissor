@@ -85,6 +85,8 @@
     import { generateShortUrlKey } from '@/utils/shortKey';
     import { database } from '@/utils/firebase';
     import { toast } from 'vue3-toastify';
+    import AnalyticsPage from '@/components/analytics-page.vue';
+    
     
     interface ComponentProps{
     createdAt: string;

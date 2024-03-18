@@ -8,7 +8,7 @@
           <span
             class="text-2xl font-semibold text-gray-400"
             v-if="!profile.photoUrl"
-            >I.E</span
+            ><A class="B"></A></span
           >
   
           <img

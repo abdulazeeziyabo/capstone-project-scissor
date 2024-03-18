@@ -9,6 +9,29 @@
     <routerLink to="/custom-url" class="flex items-center h-full border-b-[3px] border-[#f2f3f4] py-9 cursor-pointer">Customize your URLs </routerLink>
     </div>
     <div class="flex gap-8 items-center">
+      <div class="bg-gray-200 border border-[#ccc] h-[70px] w-[70px] mt-9 rounded-full mx-auto mb-10 flex items-center justify-center cursor-pointer"
+      @click="fileInput?.click()">
+      <span>{{ profile.displayName }}</span>
+      <span
+            class="text-2xl font-semibold text-gray-400"
+            v-if="!profile.photoUrl"
+            ></span
+          >
+  
+          <img
+            :src="profile.photoUrl"
+            alt="photo-url"
+            class="w-full h-full object-cover rounded-full"
+            v-else
+          />
+  
+          <input
+            type="file"
+            class="hidden"
+            ref="fileInput"
+            @change="handleFileChange"
+          />
+    </div>
      <button 
      type="button"
      @click = "handleLogout"
@@ -29,10 +52,17 @@
    import SLogo from './svg-components/SLogo.vue';
    import { useRouter } from 'vue-router';
    import { ref } from 'vue';
-   import {getAuth, signOut } from 'firebase/auth';
+   import {getAuth, signOut } from 'firebase/auth'
+   import {reactive} from 'vue'
 
    const router = useRouter();
    const isMenuActive = ref(false);
+
+   const profile = reactive({
+    email: "",
+    displayName: "",
+    photoUrl: "",
+  });
    //handle sign out
 const handleLogout = async()=>{
   try{

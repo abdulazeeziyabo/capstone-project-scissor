@@ -137,7 +137,10 @@ const handleSubmit = async () => {
             if (currentUser) {
                 // Ensure currentUser is not null before updating profile
                 await updateProfile(currentUser, {
-                    displayName: user.userName
+                    displayName: user.userName,
+                    email: user.email,
+                    photoUrl: user.photoURL,
+                    
                 });
             }
 

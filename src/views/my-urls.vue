@@ -119,8 +119,8 @@ class="flex items-center w-[100px] px-3 py-2 rounded"
         </div>
         <div v-if="showDBShareOptions">
           <div>
-            <span @click="toggleShareOptions" class="cursor-pointer font-bold"> X</span>
-            <h3 class="text-white">Share link on social media</h3>
+            <span @click="toggleShareOptions" class="cursor-pointer font-bold mr-5"> X</span>
+            <h3 class="text-white mr-5">Share link on social media</h3>
             <div class="flex gap-4 items-center">
               <button @click="shareOnSocialMedia('facebook')">
                 <img src="../assets/images/social-facebook.svg" alt="facebook icon" />
@@ -179,6 +179,17 @@ class="flex items-center w-[100px] px-3 py-2 rounded"
         </button>
       </div>
     </div>
+    <div class="max-w-4xl mx-auto bg-[#1E3448] p-4 rounded-lg mt-8 mb-8">
+      <h3 class="text-white text-lg mb-6">Logged Events</h3>
+      <ul>
+        <li v-for="(event, index) in loggedEvents" :key="index" class="text-white">
+          <span>{{ event.name }}</span>
+          <span class="ml-2">{{ event.timestamp }}</span>
+          <span v-if="event.platform">Platform: {{ event.platform }}</span>
+        <span v-if="event.shortUrl">Shortened URL: {{ event.shortUrl }}</span>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -186,15 +197,10 @@ class="flex items-center w-[100px] px-3 py-2 rounded"
 import { ref, set, serverTimestamp, push } from 'firebase/database'
 import { generateShortUrlKey } from '@/utils/shortKey'
 import { database } from '@/utils/firebase';
-import { toast } from 'vue3-toastify'
-import QRCode from 'qrcode-vue3'
-
-interface ComponentProps{
-    createdAt: string;
-  } 
-  interface ComponentMethods {
-  formatCreationTime: () => string;
-}
+import { toast } from 'vue3-toastify';
+import QRCode from 'qrcode-vue3';
+import { getAuth, onAuthStateChanged } from 'firebase/auth'; 
+import { getAnalytics, logEvent } from "firebase/analytics";
 
 interface ComponentData {
   longUrl: string;
@@ -223,6 +229,7 @@ export default {
   },
   data(): ComponentData{ {
     return {
+      loggedEvents: [],
       longUrl: '',
       customAlias: '',
       customDomain: 'scissor.io',
@@ -241,7 +248,20 @@ export default {
 }
   },
   created() {
-    this.linkCollectionsRef = ref(database, 'linkCollections')
+    this.linkCollectionsRef = ref(database, 'linkCollections');
+    const auth = getAuth(); 
+     // Listen for user authentication state changes
+     onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is signed in.
+        console.log('User is signed in');
+        logEvent(getAnalytics(), 'sign_in'); // Log sign-in event
+      } else {
+        // User is signed out.
+        console.log('User is signed out');
+        logEvent(getAnalytics(), 'sign_out'); // Log sign-out event
+      }
+    });
   },
   methods: {
     async shorten() {
@@ -274,9 +294,15 @@ export default {
         this.shortenedLink = shortUrlKey
         this.showQRCode = true
         toast.success('Success.')
+         // Log URL shortening event
+         logEvent(getAnalytics(), 'url_shortened', {
+          longUrl: this.longUrl,
+          shortUrl: this.shortenedLink
+        });
       } catch (error) {
         console.error('Error storing link:', error)
         toast.error('Failed to shorten the link. Try again.')
+        
       }
     },
     //copy to clipboard
@@ -307,6 +333,12 @@ export default {
           return
       }
       window.open(shareUrl, '_blank')
+      // Log share event
+      logEvent(getAnalytics(), 'share_on_social_media', {
+        platform: platform,
+        shortUrl: this.shortenedLink
+      });
+      
     },
     toggleShareOptions() {
       if (this.showQR) {
@@ -329,15 +361,25 @@ export default {
     handleEdit(){
 this.editedShortenedUrl = this.shortenedLink
 this.editMode = true;
-this.shortenedLink = editedShortenedLink;
+//this.shortenedLink = editedShortenedLink;
     },
     saveEditedLink() {
-    this.shortenedLink = this.editedShortenedLink;
+    this.shortenedLink = this.editedShortenedUrl;
     this.editMode = false;
-    this.editedShortenedLink = '';
+    this.editedShortenedUrl = '';
   },
-    handleDelete(index: any) {
-      this.shortenedLink.splice(index, 1)
+    handleDelete(index: number) {
+      if(Array.isArray(this.shortenedLink)){
+        this.shortenedLink.splice(index, 1)
+      }
+    },
+    logEvent(eventName: string, eventData?: any) {
+      // Log the event
+      logEvent(getAnalytics(), eventName, eventData);
+
+      // Add the event to the loggedEvents array for display
+      const timestamp = new Date().toLocaleString();
+      this.loggedEvents.unshift({ name: eventName, timestamp, ...eventData});
     }
   },
   // Computed property to format creation time

@@ -77,7 +77,8 @@
         userName: string;
         email: string;
         password:string;
-        confirmPassword:string
+        confirmPassword:string;
+        photoURL:string
     }
     const router = useRouter();
     const showEye = ref(false)
@@ -137,10 +138,8 @@ const handleSubmit = async () => {
             if (currentUser) {
                 // Ensure currentUser is not null before updating profile
                 await updateProfile(currentUser, {
-                    displayName: user.userName,
-                    email: user.email,
-                    photoUrl: user.photoURL,
-                    
+                    displayName: user.userName
+
                 });
             }
 

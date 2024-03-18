@@ -91,7 +91,7 @@
   const userData = ref();
   
   const profile = reactive({
-    email: "elochi238@gmail.com",
+    email: "",
     displayName: "",
     photoUrl: "",
   });

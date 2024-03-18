@@ -50,23 +50,9 @@
            @click.prevent="shorten">Trim URLs
            <img src="../assets/images/magic wand.png" alt="magic wand">
           </button>
-          <div v-if="shortenedLinks.length > 0" class="mt-4">
-        <ul>
-          <li v-for="shortenedLink in shortenedLinks" :key="shortenedLink.id" class="text-[#4991FF] font-semibold text-xl">
             <div>
                 <!-- Display shortened link -->
-            <a :href="shortenedLink.shortenedUrl">Shortened URL: {{ shortenedLink.shortenedUrl }}</a>
-            <!-- Display analytics data -->
-           <p> Visits: {{ shortenedLink.analytics.visits }}</p>
-            </div>
-            <!-- Display referral sources -->
-            <ul v-if="shortenedLink.analytics.referrers.length > 0">
-              <li v-for="(referrer, visits) in shortenedLink.analytics.referrers" :key="referrer">
-                Referrer: {{ referrer }} {{ visits }}
-              </li>
-            </ul>
-          </li>
-        </ul>
+            <a :href="shortenedLink" class=" mt-[190px]  text-[#3284FF]">{{ shortenedLink }}</a>
       </div>
           <p class="text-[#4991FF] text-xm mt-6">
               By clicking Trim URL, I agree to the <span class="font-semibold">Terms of services, Privacy Policy</span> and Use of Cookies.
@@ -161,7 +147,8 @@ export default {
             const analytics = getAnalytics();
         logEvent(analytics, 'url_shortened', { longUrl: this.longUrl });
             // Update UI with shortened link
-            this.shortenedLinks.push({ id: linkRef.key, shortenedUrl: `https://${shortUrlKey}/${domain.value}/${customAlias.value}`, analytics: newLink.analytics });
+            this.shortenedLink = `https://${shortUrlKey}/${domain.value}/${customAlias.value}`;
+
             toast.success('Success.');
           } catch (error) {
             console.error('Error storing link:', error);

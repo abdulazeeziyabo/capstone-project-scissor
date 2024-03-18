@@ -1,12 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import DashBoard from '@/layout/dash-board.vue';
-import productDashboard from '@/layout/product-dashboard.vue';
-import HomePage from '@/views/home-page.vue';
-import Login from '@/views/login-page.vue'
-import MyUrls from '@/views/my-urls.vue';
-import NotFound from '@/views/not-found.vue';
-import Analytics from  '@/components/analytics-page.vue';
-import Profile from '@/views/profile-page.vue'
+import DashBoard from '../layout/dash-board.vue';
+import productDashboard from '../layout/product-dashboard.vue';
+import HomePage from '../views/home-page.vue';
+import Login from '../views/login-page.vue'
+import MyUrls from '../views/my-urls.vue';
+import NotFound from '../views/not-found.vue';
+import Analytics from  '../components/analytics-page.vue';
+import Profile from '../views/profile-page.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -24,12 +24,12 @@ const router = createRouter({
         {
           path: '/faqs-page',
           name: 'faqs-page',
-          component: () => import('@/views/faqs-page.vue')
+          component: () => import('../views/faqs-page.vue')
         },
         {
           path: '/price-page',
           name: 'price-page',
-          component: () => import('@/views/price-page.vue')
+          component: () => import('../views/price-page.vue')
         },
         {
           path: '/home-page',
@@ -44,7 +44,7 @@ const router = createRouter({
         {
           path: '/sign-up',
           name: 'sign-up',
-          component: () => import('@/views/sign-up.vue')
+          component: () => import('../views/sign-up.vue')
         },
         { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFound },
       ]
@@ -62,7 +62,7 @@ const router = createRouter({
         {
           path: '/custom-url',
           name: 'custom-url',
-          component: () => import('@/views/custom-url.vue'),
+          component: () => import('../views/custom-url.vue'),
           meta: {requiresAuth: true}
          
         },

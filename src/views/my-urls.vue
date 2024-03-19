@@ -48,7 +48,7 @@
                 <input
                 class="text-xl" 
                 type="text" readonly 
-                :value="link.shortUrlKey"
+                :value="link.shortenedLink"
            v-if="!editMode"/>
            <input type="text" v-model="editedShortenedUrl" class="h-[54px] w-[420px] bg-[#ADD8E6] short" v-if="editMode">
            <div class="flex gap-8">
@@ -114,7 +114,6 @@ class="flex items-center w-[100px] px-3 py-2 rounded"
             </button>
 </div>
           </div>
-          
             
           </div>
 
@@ -138,41 +137,10 @@ class="flex items-center w-[100px] px-3 py-2 rounded"
         </div>
       
         <div v-if="showQR">
-          <div>
             <span @click="toggleQR"> </span>
-            <h4 class="text-white">Download QR Code</h4>
-            <QRCode
-              :value="shortenedLink"
-              :size="100"
-              level="H"
-              includeMargin
-              :width="150"
-              :height="150"
-              :qrOptions="{ typeNumber: 0, mode: 'Byte', errorCorrectionLevel: 'H' }"
-              :imageOptions="{ hideBackgroundDots: true, imageSize: 0.4, margin: 0 }"
-              :dotsOptions="{
-                type: 'dots',
-                color: '#26249a',
-                gradient: {
-                  type: 'linear',
-                  rotation: 0,
-                  colorStops: [
-                    { offset: 0, color: '#26249a' },
-                    { offset: 1, color: '#26249a' }
-                  ]
-                }
-              }"
-              :backgroundOptions="{ color: '#ffffff' }"
-              :cornersSquareOptions="{ type: 'dot', color: '#000000' }"
-              :cornersDotOptions="{ type: 'square', color: '#000000' }"
-              fileExt="png"
-              :download="true"
-              myclass="my-qur"
-              imgclass="img-qr"
-              downloadButton="my-button"
-              :downloadOptions="{ name: 'qrcode', extension: 'svg' }"
-            />
-          </div>
+            <button @click="downloadQRCode('svg', 150)" class="pr-[100px]">Download as SVG</button>
+            
+           
         </div>
 
              
@@ -211,7 +179,7 @@ interface ComponentData {
 export default { 
   name: 'URLShortener',
   components:{
-    QRCode,
+   
   },
   props:{
     createdAt:String
@@ -274,8 +242,8 @@ export default {
       const linkRef = push(this.linkCollectionsRef);
       const newLink:any = {
         longUrl: this.longUrl,
-        shortUrlKey: shortUrlKey,
-        createdAt: serverTimestamp()
+        shortenedLink: shortUrlKey,
+        createdAt: serverTimestamp(),
       };
 
       // Store the new link in Firebase
@@ -285,6 +253,7 @@ export default {
       this.shortenedLink = `https://${shortUrlKey}`;
       this.showQRCode = true;
       toast.success('Success.');
+
 
       // Store the new link in localStorage
       this.storeLinkInLocalStorage(newLink);
@@ -349,19 +318,45 @@ export default {
       }
       this.showDBShareOptions = !this.showDBShareOptions
     },
+    async downloadQRCode(format:string, size:number) {
+  try {
+    if (!this.shortenedLink) {
+      toast.error('No shortened link available.');
+      return;
+    }
+
+    if (format === 'svg') {
+      const svgString = await QRCode.toString(this.shortenedLink, { type: 'svg', width: size, margin: 2 });
+      const blob = new Blob([svgString], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+      const downloadLink = document.createElement('a');
+      downloadLink.href = url;
+      downloadLink.download = 'qr-code.svg';
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+      toast.success('QR Code downloaded as SVG.');
+    } else {
+      toast.error('Unsupported format.');
+    }
+  } catch (error) {
+    console.error('Error generating QR code:', error);
+    toast.error('Failed to generate QR code.');
+  }
+},
     toggleQR() {
       if (this.showDBShareOptions) {
         this.showDBShareOptions = false
       }
-      this.showQR = !this.showQR
+      this.showQR = !this.showQR  
     },
     handleEdit(index){
-this.editedShortenedUrl = this.links[index].shortUrlKey
+this.editedShortenedUrl = this.links[index].shortenedLink
 this.editMode = true;
 //this.shortenedLink = editedShortenedLink;
     },
     saveEditedLink(index) {
-    this.links[index].shortUrlKey = this.editedShortenedUrl;
+    this.links[index].shortenedLink = this.editedShortenedUrl;
     this.editMode = false;
     this.editedShortenedUrl = '';
   },

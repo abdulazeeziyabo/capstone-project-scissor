@@ -2,8 +2,8 @@
     <div class="max-w-[800px] mx-auto mt-9">
     <h2 class="text-3xl font-bold mb-9 flex gap-2 items-center">
       <img src="../assets/images/Line 70.png" alt="A line image" class="h-[44px]">FAQ</h2>
-    <div class="">
-      <div v-for="(list, index) in lists" :key="index" class="">
+    <div>
+      <div v-for="(list, index) in lists" :key="index">
         <div class="leading-[28px] text-base">
           <div class="flex justify-between items-center cursor-pointer" @click="toggleDetails(index)">
             <h3 class="font-semibold mt-6">{{ list.question }}</h3>

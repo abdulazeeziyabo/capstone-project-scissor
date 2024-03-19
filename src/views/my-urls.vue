@@ -48,7 +48,7 @@
                 <input
                 class="text-xl" 
                 type="text" readonly 
-                :value="link.shortenedLink"
+                :value="shortenedLink"
            v-if="!editMode"/>
            <input type="text" v-model="editedShortenedUrl" class="h-[54px] w-[420px] bg-[#ADD8E6] short" v-if="editMode">
            <div class="flex gap-8">
@@ -88,7 +88,7 @@ class="flex items-center w-[100px] px-3 py-2 rounded"
             </div>
           </div>
           <div >
-            <p class="mb-5 font-semi-bold mt-5" >{{link.longUrl }}</p>
+            <p class="mb-5 font-semi-bold mt-5" >{{longUrl }}</p>
           </div>
           <p class="mb-5 text-xl font-semi-bold" >Created at: {{ formatCreationTime }}</p> 
           <div class="flex gap-[100px] items-center">
@@ -220,47 +220,46 @@ export default {
     this.loadLinksFromLocalStorage();
   },
   methods: {
-  async shorten() {
-    this.error = '';
-    if (!this.longUrl) {
-      this.error = 'Please enter a long URL to shorten.';
-      return;
+    async shorten() {
+  this.error = '';
+  if (!this.longUrl) {
+    this.error = 'Please enter a long URL to shorten.';
+    return;
+  }
+
+  if (!/^(http|https):\/\/[^ "]+$/.test(this.longUrl)) {
+    this.error = 'Please enter a valid URL.';
+    return;
+  }
+
+  try {
+    const shortUrlKey = generateShortUrlKey();
+    if (!shortUrlKey) {
+      throw new Error('Short URL key is undefined');
     }
 
-    if (!/^(http|https):\/\/[^ "]+$/.test(this.longUrl)) {
-      this.error = 'Please enter a valid URL.';
-      return;
-    }
+    const linkRef = push(this.linkCollectionsRef);
+    const newLink = {
+      longUrl: this.longUrl,
+      shortenedLink: shortUrlKey,
+      createdAt: serverTimestamp(),
+    };
 
-    try {
-      const shortUrlKey = generateShortUrlKey();
-      if (!shortUrlKey) {
-        throw new Error('Short URL key is undefined');
-      }
+    // Store the new link in Firebase
+    await set(linkRef, newLink);
 
-      const linkRef = push(this.linkCollectionsRef);
-      const newLink:any = {
-        longUrl: this.longUrl,
-        shortenedLink: shortUrlKey,
-        createdAt: serverTimestamp(),
-      };
+    // Update UI with shortened link
+    this.shortenedLink = `https://${shortUrlKey}`;
+    this.showQRCode = true;
+    toast.success('Success.');
 
-      // Store the new link in Firebase
-      await set(linkRef, newLink);
-
-      // Update UI with shortened link
-      this.shortenedLink = `https://${shortUrlKey}`;
-      this.showQRCode = true;
-      toast.success('Success.');
-
-
-      // Store the new link in localStorage
-      this.storeLinkInLocalStorage(newLink);
-    } catch (error) {
-      console.error('Error storing link:', error);
-      toast.error('Failed to shorten the link. Try again.');
-    }
-  },
+    // Store the new link in localStorage
+    this.storeLinkInLocalStorage(newLink);
+  } catch (error) {
+    console.error('Error storing link:', error);
+    toast.error('Failed to shorten the link. Try again.');
+  }
+},
   // Store the link in localStorage
   storeLinkInLocalStorage(newLink) {
     const storedLinks = localStorage.getItem('links');

@@ -153,7 +153,6 @@ class="flex items-center w-[100px] px-3 py-2 rounded"
 
 <script lang="ts">
 import { ref, set, serverTimestamp, push } from 'firebase/database'
-import {reactive} from 'vue'
 import { generateShortUrlKey } from '@/utils/shortKey'
 import { database } from '@/utils/firebase';
 import { toast } from 'vue3-toastify';
@@ -326,7 +325,7 @@ export default {
     }
 
     if (format === 'svg') {
-      const svgString = await QRCode.toString(this.shortenedLink, { type: 'svg', width: size, margin: 2 });
+      const svgString = await QRCode.toString(this.shortenedLink,  { type: 'svg', width: size, margin: 2 });
       const blob = new Blob([svgString], { type: 'image/svg+xml' });
       const url = URL.createObjectURL(blob);
       const downloadLink = document.createElement('a');

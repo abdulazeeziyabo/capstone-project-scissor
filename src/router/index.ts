@@ -5,7 +5,6 @@ import HomePage from '../views/home-page.vue';
 import Login from '../views/login-page.vue'
 import MyUrls from '../views/my-urls.vue';
 import NotFound from '../views/not-found.vue';
-import Analytics from  '../components/analytics-page.vue';
 import Profile from '../views/profile-page.vue'
 
 const router = createRouter({
@@ -63,14 +62,6 @@ const router = createRouter({
           path: '/custom-url',
           name: 'custom-url',
           component: () => import('../views/custom-url.vue'),
-          meta: {requiresAuth: true}
-         
-        },
-        {
-          path: '/analytics-page/:id',
-          name: 'analytics-page',
-          component: Analytics,
-          props:true,
           meta: {requiresAuth: true}
          
         },

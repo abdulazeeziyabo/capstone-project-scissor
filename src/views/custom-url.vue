@@ -66,12 +66,11 @@
       </template>
       
       <script lang="ts">
-    import { getDatabase, ref, set, serverTimestamp, push } from 'firebase/database';
+    import { ref, set, serverTimestamp, push } from 'firebase/database';
     import { getAnalytics, logEvent } from "firebase/analytics";
     import { generateShortUrlKey } from '@/utils/shortKey';
     import { database } from '@/utils/firebase';
     import { toast } from 'vue3-toastify';
-    import AnalyticsPage from '@/components/analytics-page.vue';
     
     
     interface ComponentProps{

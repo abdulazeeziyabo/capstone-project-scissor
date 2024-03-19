@@ -1,10 +1,8 @@
 <template>
-  <div class="bg-[url('../assets/images/aurora.svg')] h-screen" bg-cover bg-no-repeat>
-    <div v-if="!showQRCode">
-      <div class="bg-[#1E3448] h-screen relative">
+  <div>
+    <div>
+      <div class="bg-[#1E3448] h-[390px] relative">
         <div>
-          <img src="../assets/images/Group 3.png" alt="" class="absolute" />
-
           <img
             src="../assets/images/Group 2 (1).png"
             alt=""
@@ -13,7 +11,7 @@
           <div
             class="bg-white w-[476px] mx-auto absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 border border-[#1E3448] rounded-md p-[48px]"
           >
-            <form action="">
+            <form>
               <label for="Long Url"></label>
               <input
                 type="text"
@@ -22,8 +20,9 @@
                 placeholder="Paste your URL here..."
                 class="w-[374px] border border-[#3284FF] rounded-md leading-[18px] pl-7 h-[45px] mb-6 focus:border-[#3284FF] focus:border-none placeholder:text-[#4991FF]"
               />
+              <small v-if="linkError" class="text-red-500">{{ linkError }}</small>
               <small v-if="error" class="text-red-500">{{ error }}</small>
-              <small v-if="linkError" class="text-red-500">{{ linkError }} </small>
+             
               <button
                 class="bg-[#3284FF] mt-4 w-[364px] h-[45px] border rounded-full text-white flex items-center gap-3 pl-[120px]"
                 @click.prevent="shorten"
@@ -31,13 +30,6 @@
                 Trim URLs
                 <img src="../assets/images/magic wand.png" alt="magic wand" />
               </button>
-              <a
-                :href="shortenedLink"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="text-[#4991FF] mt-6"
-                >{{ shortenedLink }}</a
-              >
               <p class="text-[#4991FF] text-xm mt-6">
                 By clicking Trim URL, I agree to the
                 <span class="font-semibold">Terms of services, Privacy Policy</span> and Use of
@@ -48,38 +40,40 @@
         </div>
       </div>
     </div>
-    <div v-else>
-      <div class="max-w-4xl mx-auto bg-[#1E3448]  h-[100%] border rounded-lg pt-9 ">
-        <h3 class="font-bold text-4xl pl-7 pt-9 mb-4 text-center text-white">Links</h3>
-        <div class="flex flex-col gap-5 mt-4 items-center  pt-9 pb-6 rounded-lg">
-          <div class="flex justify-items:end gap-7 pl-4 items-center ">
-           <input type="text" readonly :value="shortenedLink"
-           v-if="!editMode"
-           class="h-[54px] w-[420px] bg-[#1E3448] text-white short">
+    <div>
+        <h3 class="font-bold text-4xl pl-7 pt-9 mb-4 text-center">Links</h3>
+        <div class="mt-[80px] max-w-[900px] mx-auto border border-[#4991FF] pl-6 pt-8 pb-5 rounded-md mb-[100px]">
+          <div v-for="(link, index) in links" :key="index">
+            <div class="flex justify-items:end gap-7 pl-4 items-center text-[#4991FF] font-bold">
+                <input
+                class="text-xl" 
+                type="text" readonly 
+                :value="link.shortUrlKey"
+           v-if="!editMode"/>
            <input type="text" v-model="editedShortenedUrl" class="h-[54px] w-[420px] bg-[#ADD8E6] short" v-if="editMode">
-            <div class="flex gap-8">
+           <div class="flex gap-8">
               <button
                 @click="copyToClipboard"
                 class="flex items-center w-[80px] px-3 py-2 rounded"
               >
-                <img src="../assets/images/copy.svg" alt="copy-img" class="tooltip" /><span
-                  class="text-white"
+                <img src="../assets/images/copy.svg" alt="copy-img" /><span
+                  class=""
                   >Copy</span
                 >
               </button>
               <div class="edit-items flex gap-3">
                 <button
                 v-if="!editMode"
-                @click="handleEdit"
+                @click="handleEdit(index)"
                 class="flex items-center w-[80px] px-3 py-2 rounded edit"
               >
-                <img src="../assets/images/edit-2.svg" alt="edit icon" /><span class="text-white"
+                <img src="../assets/images/edit-2.svg" alt="edit icon" /><span class=""
                   >Edit</span
                 >
               </button>
               <button 
               v-if="editMode"
-              @click="saveEditedLink" class="flex items-center text-white w-[80px] px-3 py-2 rounded save" >
+              @click="saveEditedLink(index)" class="flex items-center  w-[80px] px-3 py-2 rounded save" >
   Save
 </button>
               </div>
@@ -87,18 +81,19 @@
 @click="handleDelete(index)"
 class="flex items-center w-[100px] px-3 py-2 rounded"
               >
-<img src="../assets/images/trash.svg" alt="delete icon" /><span class="text-white"
+<img src="../assets/images/trash.svg" alt="delete icon" /><span class=""
 >Delete</span
 >
 </button>
             </div>
           </div>
-          <div>
-            <p class="text-white">{{ longUrl }}</p>
+          <div >
+            <p class="mb-5 font-semi-bold mt-5" >{{link.longUrl }}</p>
           </div>
-          <p class="text-white">Created at: {{ formatCreationTime }}</p>
-          <div class="flex items-enter gap-6">
-            <button
+          <p class="mb-5 text-xl font-semi-bold" >Created at: {{ formatCreationTime }}</p> 
+          <div class="flex gap-[100px] items-center">
+<div>
+  <button
               @click="toggleShareOptions"
               class="flex items-center px-3 py-2 bg-[#005AE2] rounded-full"
             >
@@ -106,7 +101,9 @@ class="flex items-center w-[100px] px-3 py-2 rounded"
                 >Share link</span
               >
             </button>
-            <button
+</div>
+<div>
+  <button
               @click="toggleQR"
               class="flex items-center bg-[#005AE2] px-3 py-2 rounded-full"
             >
@@ -115,12 +112,17 @@ class="flex items-center w-[100px] px-3 py-2 rounded"
                 >QR code</span
               >
             </button>
+</div>
           </div>
+          
+            
+          </div>
+
         </div>
         <div v-if="showDBShareOptions">
-          <div>
-            <span @click="toggleShareOptions" class="cursor-pointer font-bold mr-5"> X</span>
-            <h3 class="text-white mr-5">Share link on social media</h3>
+          <div class="w-[300px] mx-auto -mt-[80px]">
+            <span @click="toggleShareOptions" class="cursor-pointer font-bold "></span>
+            <h3 class="text-xl font-bold">Share link on social media</h3>
             <div class="flex gap-4 items-center">
               <button @click="shareOnSocialMedia('facebook')">
                 <img src="../assets/images/social-facebook.svg" alt="facebook icon" />
@@ -134,6 +136,7 @@ class="flex items-center w-[100px] px-3 py-2 rounded"
             </div>
           </div>
         </div>
+      
         <div v-if="showQR">
           <div>
             <span @click="toggleQR"> </span>
@@ -143,8 +146,8 @@ class="flex items-center w-[100px] px-3 py-2 rounded"
               :size="100"
               level="H"
               includeMargin
-              :width="100"
-              :height="100"
+              :width="150"
+              :height="150"
               :qrOptions="{ typeNumber: 0, mode: 'Byte', errorCorrectionLevel: 'H' }"
               :imageOptions="{ hideBackgroundDots: true, imageSize: 0.4, margin: 0 }"
               :dotsOptions="{
@@ -171,30 +174,18 @@ class="flex items-center w-[100px] px-3 py-2 rounded"
             />
           </div>
         </div>
-        <button
-          @click="resetComponent"
-          class="bg-[#005AE2] px-3 py-2 rounded-full text-white mt-9 ml-[400px] mb-9"
-        >
-          Shorten another link
-        </button>
-      </div>
-    </div>
-    <div class="max-w-4xl mx-auto bg-[#1E3448] p-4 rounded-lg mt-8 mb-8">
-      <h3 class="text-white text-lg mb-6">Logged Events</h3>
-      <ul>
-        <li v-for="(event, index) in loggedEvents" :key="index" class="text-white">
-          <span>{{ event.name }}</span>
-          <span class="ml-2">{{ event.timestamp }}</span>
-          <span v-if="event.platform">Platform: {{ event.platform }}</span>
-        <span v-if="event.shortUrl">Shortened URL: {{ event.shortUrl }}</span>
-        </li>
-      </ul>
-    </div>
-  </div>
+
+             
+           
+           
+ </div>
+ </div>
+ 
 </template>
 
 <script lang="ts">
 import { ref, set, serverTimestamp, push } from 'firebase/database'
+import {reactive} from 'vue'
 import { generateShortUrlKey } from '@/utils/shortKey'
 import { database } from '@/utils/firebase';
 import { toast } from 'vue3-toastify';
@@ -204,9 +195,7 @@ import { getAnalytics, logEvent } from "firebase/analytics";
 
 interface ComponentData {
   longUrl: string;
-  customAlias: string;
-  customDomain: string;
-  domains: string[];
+  links: { longUrl: string, shortenedLink: string, createdAt: any }[];
   error: string;
   linkError: string;
   shortenedLink: string;
@@ -215,7 +204,7 @@ interface ComponentData {
   showDBShareOptions: boolean;
   showQR: boolean;
   createAt: any; 
-  editedShortenedUrl: boolean;
+  editedShortenedUrl: string;
   editMode: boolean;
 }
 
@@ -229,20 +218,17 @@ export default {
   },
   data(): ComponentData{ {
     return {
-      loggedEvents: [],
       longUrl: '',
-      customAlias: '',
-      customDomain: 'scissor.io',
-      domains: ['scissor.com', 'scisssor.org', 'scissor.store', 'scissor.net'],
+      shortenedLink: '',
+      links:[],
       error: '',
       linkError: '',
-      shortenedLink: '',
       linkCollectionsRef: null,
       showQRCode: false,
       showDBShareOptions: false,
       showQR: false,
       createAt: null,
-      editedShortenedUrl: false,
+      editedShortenedUrl: '',
       editMode: false
     }
 }
@@ -250,6 +236,7 @@ export default {
   created() {
     this.linkCollectionsRef = ref(database, 'linkCollections');
     const auth = getAuth(); 
+   
      // Listen for user authentication state changes
      onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -262,49 +249,65 @@ export default {
         logEvent(getAnalytics(), 'sign_out'); // Log sign-out event
       }
     });
+    // Load links from localStorage when the component is created
+    this.loadLinksFromLocalStorage();
   },
   methods: {
-    async shorten() {
-      this.error = ''
-      if (!this.longUrl) {
-        this.error = 'Please enter a long URL to shorten.'
-        return
+  async shorten() {
+    this.error = '';
+    if (!this.longUrl) {
+      this.error = 'Please enter a long URL to shorten.';
+      return;
+    }
+
+    if (!/^(http|https):\/\/[^ "]+$/.test(this.longUrl)) {
+      this.error = 'Please enter a valid URL.';
+      return;
+    }
+
+    try {
+      const shortUrlKey = generateShortUrlKey();
+      if (!shortUrlKey) {
+        throw new Error('Short URL key is undefined');
       }
 
-      if (!/^(http|https):\/\/[^ "]+$/.test(this.longUrl)) {
-        this.error = 'Please enter a valid URL.'
-        return
-      }
+      const linkRef = push(this.linkCollectionsRef);
+      const newLink:any = {
+        longUrl: this.longUrl,
+        shortUrlKey: shortUrlKey,
+        createdAt: serverTimestamp()
+      };
 
-      try {
-        const shortUrlKey = generateShortUrlKey()
-        if (!shortUrlKey) {
-          throw new Error('Short URL key is undefined')
-        }
+      // Store the new link in Firebase
+      await set(linkRef, newLink);
 
-        const linkRef = push(this.linkCollectionsRef)
-        const newLink = {
-          longUrl: this.longUrl,
-          shortUrlKey: shortUrlKey,
-          createdAt: serverTimestamp()
-        }
-        await set(linkRef, newLink)
+      // Update UI with shortened link
+      this.shortenedLink = `https://${shortUrlKey}`;
+      this.showQRCode = true;
+      toast.success('Success.');
 
-        // Update UI with shortened link
-        this.shortenedLink = shortUrlKey
-        this.showQRCode = true
-        toast.success('Success.')
-         // Log URL shortening event
-         logEvent(getAnalytics(), 'url_shortened', {
-          longUrl: this.longUrl,
-          shortUrl: this.shortenedLink
-        });
-      } catch (error) {
-        console.error('Error storing link:', error)
-        toast.error('Failed to shorten the link. Try again.')
-        
-      }
-    },
+      // Store the new link in localStorage
+      this.storeLinkInLocalStorage(newLink);
+    } catch (error) {
+      console.error('Error storing link:', error);
+      toast.error('Failed to shorten the link. Try again.');
+    }
+  },
+  // Store the link in localStorage
+  storeLinkInLocalStorage(newLink) {
+    const storedLinks = localStorage.getItem('links');
+    let links = storedLinks ? JSON.parse(storedLinks) : [];
+    links.push(newLink);
+    localStorage.setItem('links', JSON.stringify(links));
+  },
+  // Load links from localStorage
+  loadLinksFromLocalStorage() {
+    const storedLinks = localStorage.getItem('links');
+    if (storedLinks) {
+      // Update the links array with the links from localStorage
+      this.links = JSON.parse(storedLinks);
+    }
+  },
     //copy to clipboard
     async copyToClipboard() {
       try {
@@ -352,26 +355,20 @@ export default {
       }
       this.showQR = !this.showQR
     },
-    resetComponent() {
-      this.longUrl = ''
-      this.shortenedLink = ''
-      this.customAlias = ''
-      this.showQRCode = false
-    },
-    handleEdit(){
-this.editedShortenedUrl = this.shortenedLink
+    handleEdit(index){
+this.editedShortenedUrl = this.links[index].shortUrlKey
 this.editMode = true;
 //this.shortenedLink = editedShortenedLink;
     },
-    saveEditedLink() {
-    this.shortenedLink = this.editedShortenedUrl;
+    saveEditedLink(index) {
+    this.links[index].shortUrlKey = this.editedShortenedUrl;
     this.editMode = false;
     this.editedShortenedUrl = '';
   },
     handleDelete(index: number) {
-      if(Array.isArray(this.shortenedLink)){
-        this.shortenedLink.splice(index, 1)
-      }
+      this.links.splice(index, 1);
+  
+  localStorage.setItem('links', JSON.stringify(this.links));
     },
     logEvent(eventName: string, eventData?: any) {
       // Log the event

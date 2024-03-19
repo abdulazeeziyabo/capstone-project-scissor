@@ -1,5 +1,5 @@
 <template>
-    <div class="flex justify-between  items-center px-9 py-5 bg-[#F2F3F4] h-[85px]">
+    <div class="flex justify-between  items-center px-9 py-5 bg-[#F2F3F4] h-[85px] w-[100%] ">
      <div class="flex  gap-3 items-center ">
        <SLogo class="h-[34px] w-[34px] "/>
        <routerLink to="/" class="font-bold text-3xl"> Scissors</routerLink>

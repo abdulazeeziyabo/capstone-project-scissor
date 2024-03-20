@@ -22,7 +22,7 @@
               />
               <small v-if="linkError" class="text-red-500">{{ linkError }}</small>
               <small v-if="error" class="text-red-500">{{ error }}</small>
-             
+
               <button
                 class="bg-[#3284FF] mt-4 w-[364px] h-[45px] border rounded-full text-white flex items-center gap-3 pl-[120px]"
                 @click.prevent="shorten"
@@ -41,240 +41,289 @@
       </div>
     </div>
     <div>
-        <h3 class="font-bold text-4xl pl-7 pt-9 mb-4 text-center">Links</h3>
-        <div class="mt-[80px] max-w-[900px] mx-auto border border-[#4991FF] pl-6 pt-8 pb-5 rounded-md mb-[100px]">
-          <div v-for="(link, index) in links" :key="index">
-            <div class="flex justify-items:end gap-7 pl-4 items-center text-[#4991FF] font-bold">
-                <input
-                class="text-xl" 
-                type="text" readonly 
-                :value="shortenedLink"
-           v-if="!editMode"/>
-           <input type="text" v-model="editedShortenedUrl" class="h-[54px] w-[420px] bg-[#ADD8E6] short" v-if="editMode">
-           <div class="flex gap-8">
-              <button
-                @click="copyToClipboard"
-                class="flex items-center w-[80px] px-3 py-2 rounded"
-              >
-                <img src="../assets/images/copy.svg" alt="copy-img" /><span
-                  class=""
-                  >Copy</span
-                >
+      <h3 class="font-bold text-4xl pl-7 pt-9 mb-4 text-center">Links</h3>
+      <div
+        class="mt-[80px] max-w-[900px] mx-auto "
+      >
+        <div class="border border-[#4991FF] pl-6 pt-8 pb-5 rounded-md mb-[100px]"  >
+          <div class="flex justify-items:end gap-7 pl-4 items-center text-[#4991FF] font-bold">
+            <input class="text-xl" type="text" readonly :value="shortenedLink" v-if="!editMode" 
+            @click="handleShortenedLinkClick(shortenedLinkId)"
+            />
+            <input
+              type="text"
+              v-model="editedShortenedUrl"
+              class="h-[54px] w-[420px] bg-[#ADD8E6] short"
+              v-if="editMode"
+            />
+            <div class="flex gap-8">
+              <button @click="copyToClipboard" class="flex items-center w-[80px] px-3 py-2 rounded">
+                <img src="../assets/images/copy.svg" alt="copy-img" /><span class="">Copy</span>
               </button>
               <div class="edit-items flex gap-3">
                 <button
-                v-if="!editMode"
-                @click="handleEdit(index)"
-                class="flex items-center w-[80px] px-3 py-2 rounded edit"
+                  v-if="!editMode"
+                  @click="handleEdit(index)"
+                  class="flex items-center w-[80px] px-3 py-2 rounded edit"
+                >
+                  <img src="../assets/images/edit-2.svg" alt="edit icon" /><span class=""
+                    >Edit</span
+                  >
+                </button>
+                <button
+                  v-if="editMode"
+                  @click="saveEditedLink()"
+                  class="flex items-center w-[80px] px-3 py-2 rounded save"
+                >
+                  Save
+                </button>
+              </div>
+              <button
+                @click="handleDelete()"
+                class="flex items-center w-[100px] px-3 py-2 rounded"
               >
-                <img src="../assets/images/edit-2.svg" alt="edit icon" /><span class=""
-                  >Edit</span
+                <img src="../assets/images/trash.svg" alt="delete icon" /><span class=""
+                  >Delete</span
                 >
               </button>
-              <button 
-              v-if="editMode"
-              @click="saveEditedLink(index)" class="flex items-center  w-[80px] px-3 py-2 rounded save" >
-  Save
-</button>
-              </div>
-<button
-@click="handleDelete(index)"
-class="flex items-center w-[100px] px-3 py-2 rounded"
-              >
-<img src="../assets/images/trash.svg" alt="delete icon" /><span class=""
->Delete</span
->
-</button>
             </div>
           </div>
-          <div >
-            <p class="mb-5 font-semi-bold mt-5" >{{longUrl }}</p>
+          <div>
+            <p class="mb-5 font-semi-bold mt-5">{{ longUrl }}</p>
           </div>
-          <p class="mb-5 text-xl font-semi-bold" >Created at: {{ formatCreationTime }}</p> 
+          <p class="mb-5 text-xl font-semi-bold">Created at: {{ formatCreationTime }}</p>
           <div class="flex gap-[100px] items-center">
-<div>
-  <button
-              @click="toggleShareOptions"
-              class="flex items-center px-3 py-2 bg-[#005AE2] rounded-full"
-            >
-              <img src="../assets/images/share.svg" alt="share-img" /><span class="text-white"
-                >Share link</span
+            <div>
+              <button
+                @click="toggleShareOptions"
+                class="flex items-center px-3 py-2 bg-[#005AE2] rounded-full"
               >
-            </button>
-</div>
-<div>
-  <button
-              @click="toggleQR"
-              class="flex items-center bg-[#005AE2] px-3 py-2 rounded-full"
-            >
-              <img src="../assets/images/qr-code-line.svg" alt="qrcode-img" /><span
-                class="text-white"
-                >QR code</span
-              >
-            </button>
-</div>
-          </div>
-            
-          </div>
-
-        </div>
-        <div v-if="showDBShareOptions">
-          <div class="w-[300px] mx-auto -mt-[80px]">
-            <span @click="toggleShareOptions" class="cursor-pointer font-bold "></span>
-            <h3 class="text-xl font-bold">Share link on social media</h3>
-            <div class="flex gap-4 items-center">
-              <button @click="shareOnSocialMedia('facebook')">
-                <img src="../assets/images/social-facebook.svg" alt="facebook icon" />
-              </button>
-              <button @click="shareOnSocialMedia('twitter')">
-                <img src="../assets/images/twitter.svg" alt="twitter icon" />
-              </button>
-              <button @click="shareOnSocialMedia('instagram')">
-                <img src="../assets/images/instagram-fill.svg" alt="=instagram icon" />
+                <img src="../assets/images/share.svg" alt="share-img" /><span class="text-white"
+                  >Share link</span
+                >
               </button>
             </div>
+            <div>
+              <button
+                @click="toggleQR"
+                class="flex items-center bg-[#005AE2] px-3 py-2 rounded-full"
+              >
+                <img src="../assets/images/qr-code-line.svg" alt="qrcode-img" /><span
+                  class="text-white"
+                  >QR code</span
+                >
+              </button>
+            </div>
+            <div class="text-xl font-bold">Clicks: {{ visits || 0 }}</div>
           </div>
         </div>
-      
-        <div v-if="showQR">
-            <span @click="toggleQR"> </span>
-            <button @click="downloadQRCode('svg', 150)" class="pr-[100px]">Download as SVG</button>
-            
-           
+      </div>
+      <div v-if="showDBShareOptions">
+        <div class="w-[300px] mx-auto -mt-[80px]">
+          <span @click="toggleShareOptions" class="cursor-pointer font-bold"></span>
+          <h3 class="text-xl font-bold">Share link on social media</h3>
+          <div class="flex gap-4 items-center">
+            <button @click="shareOnSocialMedia('facebook')">
+              <img src="../assets/images/social-facebook.svg" alt="facebook icon" />
+            </button>
+            <button @click="shareOnSocialMedia('twitter')">
+              <img src="../assets/images/twitter.svg" alt="twitter icon" />
+            </button>
+            <button @click="shareOnSocialMedia('instagram')">
+              <img src="../assets/images/instagram-fill.svg" alt="=instagram icon" />
+            </button>
+          </div>
         </div>
+      </div>
 
-             
-           
-           
- </div>
- </div>
- 
+      <div v-if="showQR">
+        <span @click="toggleQR"> </span>
+        <QRCodeVue3
+          :width="150"
+          :height="150"
+          :value="shortenedLink"
+          :qrOptions="{ typeNumber: 0, mode: 'Byte', errorCorrectionLevel: 'H' }"
+          :imageOptions="{ hideBackgroundDots: true, imageSize: 0.4, margin: 0 }"
+          :dotsOptions="{
+            type: 'square',
+            color: '#000000',
+            gradient: {
+              type: 'linear',
+              rotation: 0,
+              colorStops: [
+                { offset: 0, color: '#000000' },
+                { offset: 1, color: '#000000' }
+              ]
+            }
+          }"
+          :backgroundOptions="{ color: '#ffffff' }"
+          :cornersSquareOptions="{ type: 'square', color: '#000000' }"
+          :cornersDotOptions="{ type: undefined, color: '#000000' }"
+          fileExt="png"
+          :download="true"
+          myclass="my-qur"
+          imgclass="img-qr"
+          downloadButton="my-button"
+          :downloadOptions="{ name: 'vqr', extension: 'svg' }"
+          class="ml-9"
+        />
+        
+      </div>
+     
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
-import { ref, set, serverTimestamp, push } from 'firebase/database'
+import { ref, set, serverTimestamp, push, get, getDatabase } from 'firebase/database'
 import { generateShortUrlKey } from '@/utils/shortKey'
-import { database } from '@/utils/firebase';
-import { toast } from 'vue3-toastify';
-import QRCode from 'qrcode-vue3';
-import { getAuth, onAuthStateChanged } from 'firebase/auth'; 
-import { getAnalytics, logEvent } from "firebase/analytics";
+import { database } from '@/utils/firebase'
+import { toast } from 'vue3-toastify'
+import QRCodeVue3 from 'qrcode-vue3'
+import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import { getAnalytics, logEvent } from 'firebase/analytics'
+
+interface ComponentProps {
+  createdAt: string
+}
+interface ComponentMethods {
+  formatCreationTime: () => string
+}
 
 interface ComponentData {
-  longUrl: string;
-  links: { longUrl: string, shortenedLink: string, createdAt: any }[];
-  error: string;
-  linkError: string;
-  shortenedLink: string;
-  linkCollectionsRef: any; 
-  showQRCode: boolean;
-  showDBShareOptions: boolean;
-  showQR: boolean;
-  createAt: any; 
-  editedShortenedUrl: string;
-  editMode: boolean;
+  longUrl: string
+  error: string
+  linkError: string
+  error: string
+  linkError: string
+  shortenedLink: string
+  linkCollectionsRef: any
+  shortenedLinks: string[]
+  showDBShareOptions: boolean
+  showQR: boolean
+  createAt: any
+  editedShortenedUrl: string
+  editMode: boolean
 }
 
-export default { 
+export default {
   name: 'URLShortener',
-  components:{
-   
+  components: {
+    QRCodeVue3
   },
-  props:{
-    createdAt:String
+  props: {
+    createdAt: String
   },
-  data(): ComponentData{ {
-    return {
-      longUrl: '',
-      shortenedLink: '',
-      links:[],
-      error: '',
-      linkError: '',
-      linkCollectionsRef: null,
-      showQRCode: false,
-      showDBShareOptions: false,
-      showQR: false,
-      createAt: null,
-      editedShortenedUrl: '',
-      editMode: false
+  data(): ComponentData {
+    {
+      return {
+        longUrl: '',
+        error: '',
+        linkError: '',
+        shortenedLink: '',
+        linkCollectionsRef: null,
+        shortenedLinks: [],
+        showQRCode: false,
+        showDBShareOptions: false,
+        showQR: false,
+        createAt: null,
+        editedShortenedUrl: '',
+        editMode: false,
+        clicks: 0
+      }
     }
-}
   },
   created() {
-    this.linkCollectionsRef = ref(database, 'linkCollections');
-    const auth = getAuth(); 
-   
-     // Listen for user authentication state changes
-     onAuthStateChanged(auth, (user) => {
-      if (user) {
-        // User is signed in.
-        console.log('User is signed in');
-        logEvent(getAnalytics(), 'sign_in'); // Log sign-in event
-      } else {
-        // User is signed out.
-        console.log('User is signed out');
-        logEvent(getAnalytics(), 'sign_out'); // Log sign-out event
-      }
-    });
-    // Load links from localStorage when the component is created
-    this.loadLinksFromLocalStorage();
+    this.linkCollectionsRef = ref(database, 'linkCollections')
+  //   // Retrieve stored shortened link when the component is created
+  const storedShortenedLink = localStorage.getItem('shortenedLink');
+  if (storedShortenedLink) {
+    this.shortenedLink = storedShortenedLink;
+  }
+  
   },
   methods: {
     async shorten() {
-  this.error = '';
-  if (!this.longUrl) {
-    this.error = 'Please enter a long URL to shorten.';
-    return;
-  }
+      // Validate URL
+      this.error = ''
+      if (!this.longUrl) {
+        this.error = 'Please enter a long URL to shorten.'
+        return
+      }
 
-  if (!/^(http|https):\/\/[^ "]+$/.test(this.longUrl)) {
-    this.error = 'Please enter a valid URL.';
-    return;
-  }
+      if (!/^(http|https):\/\/[^ "]+$/.test(this.longUrl)) {
+        this.error = 'Please enter a valid URL.'
+        return
+      }
 
-  try {
-    const shortUrlKey = generateShortUrlKey();
-    if (!shortUrlKey) {
-      throw new Error('Short URL key is undefined');
+      try {
+        const shortUrlKey = generateShortUrlKey()
+        if (!shortUrlKey) {
+          throw new Error('Short URL key is undefined')
+        }
+        // Store new shortened link in Firebase
+        const linkRef = push(this.linkCollectionsRef) // Create a reference to a new child nod
+        const newLink = {
+          longUrl: this.longUrl,
+          shortUrlKey: shortUrlKey,
+          createdAt: serverTimestamp(),
+          analytics: { visits: 0, referrers: {} }
+        }
+        await set(linkRef, newLink)
+
+        const analytics = getAnalytics()
+        logEvent(analytics, 'url_shortened', { longUrl: this.longUrl })
+        // Update UI with shortened link
+        this.shortenedLink = `https://${shortUrlKey}`
+
+        //store in local stroage
+        localStorage.setItem('shortenedLink', this.shortenedLink); 
+        
+
+        toast.success('Success.')
+      } catch (error) {
+        console.error('Error storing link:', error)
+        toast.error('Failed to shorten the link. Try again.')
+      }
+    },
+    //handle clicks on shortened url
+    async handleShortenedLinkClick(shortenedLinkId) {
+  
+    try {
+        // Retrieve the shortened link from the database
+        const linkSnapshot = await get(ref(database, `linkCollections/${shortenedLinkId}`));
+        if (linkSnapshot.exists()) {
+            const linkData = linkSnapshot.val();
+
+            // Increment visit count
+            linkData.analytics.visits++;
+            const referralSource = this.detectReferralSource();
+            // Implement this function to detect referral source
+            if (referralSource) {
+                if (!linkData.analytics.referrers[referralSource]) {
+                    linkData.analytics.referrers[referralSource] = 1;
+                } else {
+                    linkData.analytics.referrers[referralSource]++;
+                }
+            }
+
+            // Update analytics data in the database
+            await Promise.all([
+        set(ref(database, `linkCollections/${shortenedLinkId}/analytics`), linkData.analytics),
+        set(ref(database, `linkCollections/${shortenedLinkId}/clicks`), linkData.clicks)
+      ]);
+            // Redirect the user to the original URL
+            window.location.href = linkData.longUrl;
+        } else {
+            // Handle error: Shortened link not found
+            console.error('Error: shortened link not found');
+            toast.error('Failed to find the shortened link. Try again.');
+        }
+    } catch (error) {
+        console.error('Error handling shortened link click:', error);
+        toast.error('An error occurred while processing the shortened link.');
     }
-
-    const linkRef = push(this.linkCollectionsRef);
-    const newLink = {
-      longUrl: this.longUrl,
-      shortenedLink: shortUrlKey,
-      createdAt: serverTimestamp(),
-    };
-
-    // Store the new link in Firebase
-    await set(linkRef, newLink);
-
-    // Update UI with shortened link
-    this.shortenedLink = `https://${shortUrlKey}`;
-    this.showQRCode = true;
-    toast.success('Success.');
-
-    // Store the new link in localStorage
-    this.storeLinkInLocalStorage(newLink);
-  } catch (error) {
-    console.error('Error storing link:', error);
-    toast.error('Failed to shorten the link. Try again.');
-  }
 },
-  // Store the link in localStorage
-  storeLinkInLocalStorage(newLink) {
-    const storedLinks = localStorage.getItem('links');
-    let links = storedLinks ? JSON.parse(storedLinks) : [];
-    links.push(newLink);
-    localStorage.setItem('links', JSON.stringify(links));
-  },
-  // Load links from localStorage
-  loadLinksFromLocalStorage() {
-    const storedLinks = localStorage.getItem('links');
-    if (storedLinks) {
-      // Update the links array with the links from localStorage
-      this.links = JSON.parse(storedLinks);
-    }
-  },
     //copy to clipboard
     async copyToClipboard() {
       try {
@@ -307,8 +356,7 @@ export default {
       logEvent(getAnalytics(), 'share_on_social_media', {
         platform: platform,
         shortUrl: this.shortenedLink
-      });
-      
+      })
     },
     toggleShareOptions() {
       if (this.showQR) {
@@ -316,65 +364,39 @@ export default {
       }
       this.showDBShareOptions = !this.showDBShareOptions
     },
-    async downloadQRCode(format:string, size:number) {
-  try {
-    if (!this.shortenedLink) {
-      toast.error('No shortened link available.');
-      return;
-    }
-
-    if (format === 'svg') {
-      const svgString = await QRCode.toString(this.shortenedLink,  { type: 'svg', width: size, margin: 2 });
-      const blob = new Blob([svgString], { type: 'image/svg+xml' });
-      const url = URL.createObjectURL(blob);
-      const downloadLink = document.createElement('a');
-      downloadLink.href = url;
-      downloadLink.download = 'qr-code.svg';
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
-      toast.success('QR Code downloaded as SVG.');
-    } else {
-      toast.error('Unsupported format.');
-    }
-  } catch (error) {
-    console.error('Error generating QR code:', error);
-    toast.error('Failed to generate QR code.');
-  }
-},
     toggleQR() {
       if (this.showDBShareOptions) {
         this.showDBShareOptions = false
       }
-      this.showQR = !this.showQR  
+      this.showQR = !this.showQR
     },
-    handleEdit(index){
-this.editedShortenedUrl = this.links[index].shortenedLink
-this.editMode = true;
-//this.shortenedLink = editedShortenedLink;
+    handleEdit() {
+      this.editedShortenedUrl = this.shortenedLink
+      this.editMode = true
+      //this.shortenedLink = editedShortenedLink;
     },
-    saveEditedLink(index) {
-    this.links[index].shortenedLink = this.editedShortenedUrl;
-    this.editMode = false;
-    this.editedShortenedUrl = '';
-  },
-    handleDelete(index: number) {
-      this.links.splice(index, 1);
-  
-  localStorage.setItem('links', JSON.stringify(this.links));
+    saveEditedLink() {
+      this.shortenedLink = this.editedShortenedUrl
+      this.editMode = false
+      this.editedShortenedUrl = ''
+    },
+    handleDelete() {
+      this.shortenedLink = '';
+
+      // localStorage.setItem('links', JSON.stringify(this.links))
     },
     logEvent(eventName: string, eventData?: any) {
       // Log the event
-      logEvent(getAnalytics(), eventName, eventData);
+      logEvent(getAnalytics(), eventName, eventData)
 
       // Add the event to the loggedEvents array for display
-      const timestamp = new Date().toLocaleString();
-      this.loggedEvents.unshift({ name: eventName, timestamp, ...eventData});
-    }
+      const timestamp = new Date().toLocaleString()
+      this.loggedEvents.unshift({ name: eventName, timestamp, ...eventData })
+    },
   },
   // Computed property to format creation time
   computed: {
-    formatCreationTime():string {
+    formatCreationTime(): string {
       if (this.createdAt) {
         const creationDate = new Date(this.createdAt)
         return creationDate.toLocaleString() // Adjust the format as needed
@@ -383,20 +405,23 @@ this.editMode = true;
     }
   }
 }
+
 </script>
 
 <style scoped>
-.short{
-outline: none;
-color: white;
+.short {
+  outline: none;
+  color: white;
 }
-.edit-items{
+.edit-items {
   font-size: 18px;
-  animation-duration:0.2s
-    
+  animation-duration: 0.2s;
 }
-.save{
-    display: flex;
-  align-items: center; 
+.save {
+  display: flex;
+  align-items: center;
+}
+.my-qur {
+  margin-right: 100px;
 }
 </style>

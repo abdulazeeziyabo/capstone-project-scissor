@@ -114,8 +114,12 @@
                 >
               </button>
             </div>
+            <div>
+            <button @click="handleStats" class=" bg-[#005AE2] px-3 py-2 rounded-full">View Stats</button>
+          </div>
             <div class="text-xl font-bold">Clicks: {{ visits || 0 }}</div>
           </div>
+          
         </div>
       </div>
       <div v-if="showDBShareOptions">
@@ -179,7 +183,8 @@ import { ref, set, serverTimestamp, push, get, getDatabase } from 'firebase/data
 import { generateShortUrlKey } from '@/utils/shortKey'
 import { database } from '@/utils/firebase'
 import { toast } from 'vue3-toastify'
-import QRCodeVue3 from 'qrcode-vue3'
+import QRCodeVue3 from 'qrcode-vue3';
+import {useRouter} from 'vue-router'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { getAnalytics, logEvent } from 'firebase/analytics'
 
@@ -192,10 +197,10 @@ interface ComponentMethods {
 
 interface ComponentData {
   longUrl: string
-  error: string
-  linkError: string
-  error: string
-  linkError: string
+  error: string;
+  linkError: string;
+  error: string;
+  linkError: string;
   shortenedLink: string
   linkCollectionsRef: any
   shortenedLinks: string[]
@@ -214,6 +219,14 @@ export default {
   props: {
     createdAt: String
   },
+  setup(){
+   const router = useRouter();
+   const handleStats =  ()=>{
+    console.log('i was clicked')
+      router.push(`my-urls/:id`)
+    }
+return {handleStats}
+  },
   data(): ComponentData {
     {
       return {
@@ -229,7 +242,8 @@ export default {
         createAt: null,
         editedShortenedUrl: '',
         editMode: false,
-        clicks: 0
+        clicks: 0,
+      
       }
     }
   },
@@ -393,13 +407,14 @@ export default {
       const timestamp = new Date().toLocaleString()
       this.loggedEvents.unshift({ name: eventName, timestamp, ...eventData })
     },
+    
   },
   // Computed property to format creation time
   computed: {
     formatCreationTime(): string {
       if (this.createdAt) {
         const creationDate = new Date(this.createdAt)
-        return creationDate.toLocaleString() // Adjust the format as needed
+        return creationDate.toLocaleString() 
       }
       return new Date().toLocaleString()
     }

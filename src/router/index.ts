@@ -59,6 +59,13 @@ const router = createRouter({
           meta: {requiresAuth: true}
         },
         {
+          path: '/my-urls/:id',
+          name: 'view-stats',
+          component: ()=> import('../components/view-stats.vue')
+          },
+          
+    
+        {
           path: '/custom-url',
           name: 'custom-url',
           component: () => import('../views/custom-url.vue'),

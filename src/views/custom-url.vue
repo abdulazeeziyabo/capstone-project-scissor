@@ -4,20 +4,7 @@
         <div class="bg-[#1E3448] h-screen relative ">
             <div>
           <button  class="flex items-center gap-3 tracking-[1.8px] text-[#59636E] text-xs font-bold uppercase pt-9 pl-9 cursor-pointer mb-5" @click="$router.go(-1)">
-              <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="8"
-              height="13"
-              viewBox="0 0 8 13"
-              fill="none"
-            >
-              <path
-                fill-rule="evenodd"
-                clip-rule="evenodd"
-                d="M8 11.7L6.66667 13L0 6.5L6.66667 0L8 1.3L2.70833 6.5L8 11.7Z"
-                fill="#59636E"
-              />
-            </svg>
+           <Back/>   
             Back
           </button>
           <img src="../assets/images/Group 3.png" alt="" class="absolute">
@@ -71,6 +58,7 @@
     import { generateShortUrlKey } from '@/utils/shortKey';
     import { database } from '@/utils/firebase';
     import { toast } from 'vue3-toastify';
+    import Back from '@/components/back-page.vue'
     
     
     interface ComponentProps{
@@ -94,6 +82,9 @@ interface ComponentData {
 
 export default { 
   name: 'URLShortener',
+  components:{
+    Back
+  },
   props:{
     createdAt:String
   },
@@ -154,35 +145,8 @@ export default {
             toast.error('Failed to shorten the link. Try again.');
           }
         },
-        async handleShortenedLinkClick(shortenedLinkId) {
-    // Retrieve the shortened link from the database
-    const linkSnapshot = await ref(database, `linkCollections/${shortenedLinkId}`).get();
-    if (linkSnapshot.exists()) {
-      const linkData = linkSnapshot.val();
 
-      // Increment visit count
-      linkData.analytics.visits++;
-      const referralSource = this.detectReferralSource(); // Implement this function to detect referral source
-      if (referralSource) {
-        if (!linkData.analytics.referrers[referralSource]) {
-          linkData.analytics.referrers[referralSource] = 1;
-        } else {
-          linkData.analytics.referrers[referralSource]++;
-        }
       }
-
-      // Update analytics data in the database
-      await set(ref(database, `linkCollections/${shortenedLinkId}/analytics`), linkData.analytics);
-
-      // Redirect the user to the original URL
-      window.location.href = linkData.longUrl;
-    } else {
-      // Handle error: Shortened link not found
-      console.error('Error shorten link not found:', error);
-            toast.error('Failed to find shorten the link. Try again.');
-    }
-  }
-      },
     }
 
     </script>

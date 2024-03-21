@@ -48,7 +48,7 @@
         <div class="border border-[#4991FF] pl-6 pt-8 pb-5 rounded-md mb-[100px]"  >
           <div class="flex justify-items:end gap-7 pl-4 items-center text-[#4991FF] font-bold">
             <input class="text-xl" type="text" readonly :value="shortenedLink" v-if="!editMode" 
-            @click="handleShortenedLinkClick(shortenedLinkId)"
+            @click="handleClick"
             />
             <input
               type="text"
@@ -117,7 +117,7 @@
             <div>
             <button @click="handleStats" class=" bg-[#005AE2] px-3 py-2 rounded-full">View Stats</button>
           </div>
-            <div class="text-xl font-bold">Clicks: {{ visits || 0 }}</div>
+            <div class="text-xl font-bold">Clicks: {{ (views || 0) }}</div>
           </div>
           
         </div>
@@ -179,7 +179,7 @@
 </template>
 
 <script lang="ts">
-import { ref, set, serverTimestamp, push, get, getDatabase } from 'firebase/database'
+import { ref, set, serverTimestamp, push, get, getDatabase, runTransaction} from 'firebase/database'
 import { generateShortUrlKey } from '@/utils/shortKey'
 import { database } from '@/utils/firebase'
 import { toast } from 'vue3-toastify'
@@ -242,7 +242,7 @@ return {handleStats}
         createAt: null,
         editedShortenedUrl: '',
         editMode: false,
-        clicks: 0,
+        views: 0,
       
       }
     }
@@ -281,7 +281,8 @@ return {handleStats}
           longUrl: this.longUrl,
           shortUrlKey: shortUrlKey,
           createdAt: serverTimestamp(),
-          analytics: { visits: 0, referrers: {} }
+          views:0,
+          clicks:{location: '', totalClicks: ''}
         }
         await set(linkRef, newLink)
 
@@ -301,43 +302,34 @@ return {handleStats}
       }
     },
     //handle clicks on shortened url
-    async handleShortenedLinkClick(shortenedLinkId) {
-  
-    try {
-        // Retrieve the shortened link from the database
-        const linkSnapshot = await get(ref(database, `linkCollections/${shortenedLinkId}`));
-        if (linkSnapshot.exists()) {
-            const linkData = linkSnapshot.val();
+    async handleClick() {
+      // Increment view count
+      const viewsRef = ref(database, `linkCollect/${this.shortUrlKey}/analytics/views`);
+      try {
+        await runTransaction(viewsRef, (currentViews) => {
+          // Increment view count by 1
+          return (currentViews || 0) + 1;
+        });
+      } catch (error) {
+        console.error('Error updating view count:', error);
+        toast.error('Error updating view count')
+        return;
+      }
 
-            // Increment visit count
-            linkData.analytics.visits++;
-            const referralSource = this.detectReferralSource();
-            // Implement this function to detect referral source
-            if (referralSource) {
-                if (!linkData.analytics.referrers[referralSource]) {
-                    linkData.analytics.referrers[referralSource] = 1;
-                } else {
-                    linkData.analytics.referrers[referralSource]++;
-                }
-            }
+      // Retrieve long URL
+      const longUrlRef = ref(database, `linkCollect/${this.shortUrlKey}/longUrl`);
+      let longUrl;
+      try {
+        const snapshot = await get(longUrlRef);
+        longUrl = snapshot.val();
+      } catch (error) {
+        console.error('Error retrieving long URL:', error);
+        return;
+      }
 
-            // Update analytics data in the database
-            await Promise.all([
-        set(ref(database, `linkCollections/${shortenedLinkId}/analytics`), linkData.analytics),
-        set(ref(database, `linkCollections/${shortenedLinkId}/clicks`), linkData.clicks)
-      ]);
-            // Redirect the user to the original URL
-            window.location.href = linkData.longUrl;
-        } else {
-            // Handle error: Shortened link not found
-            console.error('Error: shortened link not found');
-            toast.error('Failed to find the shortened link. Try again.');
-        }
-    } catch (error) {
-        console.error('Error handling shortened link click:', error);
-        toast.error('An error occurred while processing the shortened link.');
-    }
-},
+      // Redirect user to long URL
+      window.location.href = longUrl;
+    },
     //copy to clipboard
     async copyToClipboard() {
       try {

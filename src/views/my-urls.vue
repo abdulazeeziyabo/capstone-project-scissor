@@ -115,7 +115,9 @@
               </button>
             </div>
             <div>
-            <button @click="handleStats" class=" bg-[#005AE2] px-3 py-2 rounded-full">View Stats</button>
+            <button @click="handleStats" class="flex items-center bg-[#005AE2] px-3 py-2 gap-2 rounded-full text-white">
+              <img src="../assets/images/chart-line-up.svg" alt="Stats" class="w-[24px] h-[24px]">
+              <span>View Stats</span></button>
           </div>
             <div class="text-xl font-bold">Clicks: {{ (views || 0) }}</div>
           </div>

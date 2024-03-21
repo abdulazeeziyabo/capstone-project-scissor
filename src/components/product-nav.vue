@@ -26,7 +26,7 @@
     </div>
     <div class="flex gap-8 items-center">
       <div class="mt-9 rounded-full mx-auto mb-10 cursor-pointer flex items-center gap-2">
-        <span class="text-bold text-xl">{{ profile.displayName }}</span>
+        <span class="text-bold text-xl">Welcome {{ profile.displayName }}</span>
         <span class="text-2xl font-semibold text-gray-400" v-if="!profile.photoUrl"></span>
 
         <img
